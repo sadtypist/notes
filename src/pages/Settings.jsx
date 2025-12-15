@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus } from 'react-icons/fi';
+import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload } from 'react-icons/fi';
 import db from '../services/db';
+import { driveService } from '../services/GoogleDriveService';
 
 const Settings = () => {
     const location = useLocation();
     const [url, setUrl] = useState(localStorage.getItem('easeNotes_supabaseUrl') || '');
     const [key, setKey] = useState(localStorage.getItem('easeNotes_supabaseKey') || '');
+
+    // Google Drive State
+    const [gClientId, setGClientId] = useState(localStorage.getItem('easeNotes_gClientId') || '');
+    const [isGDriveConnected, setIsGDriveConnected] = useState(false);
+    const [driveBackups, setDriveBackups] = useState([]);
+    const [driveStatus, setDriveStatus] = useState('');
+
     const [activeTab, setActiveTab] = useState('cloud'); // 'cloud', 'data', 'general'
 
     // Initialize tab from URL
@@ -31,6 +39,71 @@ const Settings = () => {
         setTimeout(() => setSaved(false), 2000);
         // Force reload to re-init services
         window.location.reload();
+    };
+
+    // Google Drive Handlers
+    const handleConnectDrive = async () => {
+        if (!gClientId) return alert("Please enter a Google Client ID first.");
+        setDriveStatus("Initializing...");
+        try {
+            localStorage.setItem('easeNotes_gClientId', gClientId);
+            await driveService.init(gClientId);
+            await driveService.signIn();
+            setIsGDriveConnected(true);
+            setDriveStatus("Connected! Fetching backups...");
+            await refreshBackups();
+        } catch (err) {
+            console.error(err);
+            setDriveStatus("Connection failed. Check console.");
+        }
+    };
+
+    const refreshBackups = async () => {
+        try {
+            const files = await driveService.listBackups();
+            setDriveBackups(files);
+            setDriveStatus("");
+        } catch (err) {
+            setDriveStatus("Failed to list backups.");
+        }
+    };
+
+    const handleDriveBackup = async () => {
+        setDriveStatus("Backing up...");
+        try {
+            const data = {
+                notes: JSON.parse(localStorage.getItem('easeNotes_notes') || '[]'),
+                folders: JSON.parse(localStorage.getItem('easeNotes_folders') || '[]'),
+                user: JSON.parse(localStorage.getItem('easeNotes_user') || 'null'),
+                timestamp: new Date().toISOString()
+            };
+            await driveService.uploadBackup(JSON.stringify(data));
+            setDriveStatus("Backup successful!");
+            refreshBackups();
+        } catch (err) {
+            console.error(err);
+            setDriveStatus("Backup failed.");
+        }
+    };
+
+    const handleDriveRestore = async (fileId) => {
+        if (!window.confirm("Restore from this backup? CURRENT LOCAL DATA WILL BE REPLACED.")) return;
+
+        setDriveStatus("Restoring...");
+        try {
+            const data = await driveService.fetchBackupContent(fileId);
+            if (data.notes) localStorage.setItem('easeNotes_notes', JSON.stringify(data.notes));
+            if (data.folders) localStorage.setItem('easeNotes_folders', JSON.stringify(data.folders));
+            // We usually don't overwrite user unless it's a full snapshot restore desired by user.
+            // Let's safe keep user if possible, or overwrite if data.user exists? 
+            // Better to keep current login session active.
+
+            setDriveStatus("Restore complete! Reloading...");
+            setTimeout(() => window.location.reload(), 1500);
+        } catch (err) {
+            console.error(err);
+            setDriveStatus("Restore failed.");
+        }
     };
 
     const handleMigration = async () => {
@@ -94,7 +167,7 @@ const Settings = () => {
     };
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto', paddingBottom: '100px' }}>
             <div className="glass-panel" style={{ padding: '2rem', borderRadius: 'var(--radius-xl)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                     <div style={{
@@ -113,7 +186,7 @@ const Settings = () => {
                 </div>
 
                 {/* Tabs */}
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--glass-border)' }}>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--glass-border)', overflowX: 'auto' }}>
                     <button
                         onClick={() => setActiveTab('cloud')}
                         style={{
@@ -124,7 +197,8 @@ const Settings = () => {
                             color: activeTab === 'cloud' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                             fontWeight: activeTab === 'cloud' ? '600' : '400',
                             cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: '0.5rem'
+                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         <FiCloud /> Cloud Sync
@@ -139,7 +213,8 @@ const Settings = () => {
                             color: activeTab === 'data' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                             fontWeight: activeTab === 'data' ? '600' : '400',
                             cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: '0.5rem'
+                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         <FiSave /> Data Management
@@ -154,7 +229,8 @@ const Settings = () => {
                             color: activeTab === 'general' ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
                             fontWeight: activeTab === 'general' ? '600' : '400',
                             cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: '0.5rem'
+                            display: 'flex', alignItems: 'center', gap: '0.5rem',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         <FiGrid /> General
@@ -164,11 +240,86 @@ const Settings = () => {
                 {/* Cloud Tab */}
                 {activeTab === 'cloud' && (
                     <div className="animate-fade-in">
+                        {/* Google Drive Section */}
+                        <div style={{ marginBottom: '3rem' }}>
+                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <FiHardDrive /> Google Drive Backup
+                            </h2>
+                            <p style={{ marginBottom: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                                Securely backup your notes to your personal Google Drive. Requires a Google Client ID.
+                            </p>
+
+                            {!isGDriveConnected ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Google Client ID"
+                                        value={gClientId}
+                                        onChange={(e) => setGClientId(e.target.value)}
+                                        className="input"
+                                        style={{ fontSize: '0.9rem' }}
+                                    />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <button
+                                            onClick={handleConnectDrive}
+                                            className="btn"
+                                            style={{ background: 'var(--color-accent-primary)', color: 'white' }}
+                                        >
+                                            <FiCloud /> Connect Drive
+                                        </button>
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{driveStatus}</span>
+                                    </div>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+                                        Don't have a Client ID? <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Create one here</a> (Enable "Google Drive API" first).
+                                    </p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+                                        <button onClick={handleDriveBackup} className="btn" style={{ background: 'var(--color-success)', color: 'white' }}>
+                                            <FiUpload /> Backup Now
+                                        </button>
+                                        <button onClick={refreshBackups} className="btn-ghost" title="Refresh list">
+                                            Refresh
+                                        </button>
+                                        <span style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{driveStatus}</span>
+                                    </div>
+
+                                    {driveBackups.length > 0 ? (
+                                        <div style={{ background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+                                            <h4 style={{ fontSize: '0.9rem', marginBottom: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Available Backups</h4>
+                                            {driveBackups.map(file => (
+                                                <div key={file.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid var(--glass-border)' }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: '500' }}>{file.name}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                                                            {new Date(file.createdTime).toLocaleString()}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDriveRestore(file.id)}
+                                                        className="btn-ghost"
+                                                        style={{ color: 'var(--color-accent-primary)', fontSize: '0.9rem' }}
+                                                    >
+                                                        <FiDownload /> Restore
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p style={{ fontStyle: 'italic', color: 'var(--color-text-muted)' }}>No backups found.</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <div style={{ height: '1px', background: 'var(--glass-border)', margin: '2rem 0' }}></div>
+
                         <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <FiCloud /> Connection Setup
+                            <FiCloud /> Supabase Sync (Legacy)
                         </h2>
                         <p style={{ marginBottom: '1.5rem', lineHeight: '1.6', color: 'var(--color-text-secondary)' }}>
-                            Connect to Supabase to enable cloud storage, multi-device sync, and unlimited backup.
+                            Connect to Supabase for real-time multi-device sync.
                         </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
@@ -199,8 +350,8 @@ const Settings = () => {
                                 className="btn"
                                 style={{
                                     alignSelf: 'flex-start',
-                                    background: saved ? 'var(--color-success)' : 'var(--color-accent-primary)',
-                                    color: 'white',
+                                    background: saved ? 'var(--color-success)' : 'var(--color-bg-tertiary)',
+                                    color: saved ? 'white' : 'var(--color-text-primary)',
                                     display: 'flex', alignItems: 'center', gap: '0.5rem'
                                 }}
                             >
