@@ -40,6 +40,8 @@
   /* Glass panel opacity */
   --glass-bg: rgba(30, 41, 59, 0.7);
   --glass-border: rgba(255, 255, 255, 0.05);
+
+  --header-gradient: linear-gradient(to right, #fff, #94a3b8);
 }
 
 /* Light Theme */
@@ -63,6 +65,8 @@
 
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(0, 0, 0, 0.08);
+
+  --header-gradient: linear-gradient(to right, #1e293b, #6366f1);
 }
 
 * {

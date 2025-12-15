@@ -59,9 +59,8 @@ const Home = () => {
                     <h1 style={{
                         fontSize: '2rem',
                         fontWeight: '800',
-                        background: isDark
-                            ? 'linear-gradient(to right, #fff, #94a3b8)'
-                            : 'linear-gradient(to right, #1e293b, #6366f1)',
+                        fontWeight: '800',
+                        background: 'var(--header-gradient)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         display: 'flex',

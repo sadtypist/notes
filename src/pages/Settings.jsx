@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus } from 'react-icons/fi';
 import db from '../services/db';
 
 const Settings = () => {
+    const location = useLocation();
     const [url, setUrl] = useState(localStorage.getItem('easeNotes_supabaseUrl') || '');
     const [key, setKey] = useState(localStorage.getItem('easeNotes_supabaseKey') || '');
     const [activeTab, setActiveTab] = useState('cloud'); // 'cloud', 'data', 'general'
+
+    // Initialize tab from URL
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tab = params.get('tab');
+        if (tab && ['cloud', 'data', 'general'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [location.search]);
 
     // Status
     const [saved, setSaved] = useState(false);

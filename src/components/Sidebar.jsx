@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { FiGrid, FiStar, FiFolder, FiTrash2, FiLogOut, FiSettings, FiPlus, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { FiGrid, FiStar, FiFolder, FiTrash2, FiLogOut, FiSettings, FiPlus, FiChevronLeft, FiChevronRight, FiCloud } from 'react-icons/fi';
 import { useUser } from '../context/UserContext';
 import { useNotes } from '../context/NotesContext';
 
 const Sidebar = () => {
     const { logout } = useUser();
     const { folders, deleteFolder } = useNotes();
-    const navigate = useNavigate(); // Added hook
+    const navigate = useNavigate();
+    const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const handleCreateFolder = () => {
@@ -201,8 +202,8 @@ const Sidebar = () => {
                     <div style={{ flex: 1 }} />
 
                     <NavLink
-                        to="/trash"
-                        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                        to="/settings?tab=cloud"
+                        className={({ isActive }) => `sidebar-link ${location.pathname === '/settings' && location.search.includes('tab=cloud') ? 'active' : ''}`}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -215,6 +216,29 @@ const Sidebar = () => {
                             transition: 'all 0.2s',
                             marginTop: '1rem',
                             borderTop: '1px solid var(--glass-border)'
+                        }}
+                        title={isCollapsed ? "Cloud Sync" : ""}
+                    >
+                        <div style={{ color: 'var(--color-accent-primary)', display: 'flex', alignItems: 'center' }}>
+                            <FiCloud size={20} />
+                        </div>
+                        {!isCollapsed && <span>Cloud Sync</span>}
+                    </NavLink>
+
+                    <NavLink
+                        to="/trash"
+                        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: isCollapsed ? 'center' : 'flex-start',
+                            gap: '0.75rem',
+                            padding: '0.75rem',
+                            borderRadius: 'var(--radius-md)',
+                            color: 'var(--color-text-secondary)',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s',
+                            marginTop: '0.5rem',
                         }}
                         title={isCollapsed ? "Trash Bin" : ""}
                     >
