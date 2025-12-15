@@ -1,0 +1,412 @@
+/* Premium Design System - EaseNotes */
+:root {
+  /* Premium Dark Theme Palette (Default) */
+  --color-bg-primary: #0f172a;
+  /* Deep Slate */
+  --color-bg-secondary: #1e293b;
+  /* Lighter Slate */
+  --color-bg-tertiary: #334155;
+  /* Interactive Surface */
+
+  --color-text-primary: #f8fafc;
+  /* Almost White */
+  --color-text-secondary: #94a3b8;
+  /* Muted Blue-Grey */
+  --color-text-muted: #64748b;
+
+  --color-accent-primary: #6366f1;
+  /* Indigo */
+  --color-accent-hover: #4f46e5;
+  --color-accent-subtle: rgba(99, 102, 241, 0.1);
+
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.3);
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Glass panel opacity */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #e2e8f0;
+
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+
+  --color-accent-primary: #6366f1;
+  --color-accent-hover: #4f46e5;
+  --color-accent-subtle: rgba(99, 102, 241, 0.15);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.08);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: var(--color-accent-primary);
+  color: white;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-tertiary);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.input {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  width: 100%;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Voice Recorder Styles */
+.voice-recorder {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.recording-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-danger);
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+.recording-time {
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+}
+
+.stop-btn {
+  background-color: var(--color-danger);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.stop-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Audio Player Styles */
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--color-bg-secondary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.5rem;
+}
+
+.play-pause-btn {
+  background-color: var(--color-accent-primary);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.play-pause-btn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.audio-progress-container {
+  flex: 1;
+  height: 6px;
+  background: var(--color-bg-tertiary);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.audio-progress-bar {
+  height: 100%;
+  background: var(--color-accent-primary);
+  transition: width 0.1s linear;
+}
+
+.audio-time {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  min-width: 80px;
+  text-align: center;
+}
+
+.delete-audio-btn {
+  color: var(--color-text-muted);
+}
+
+.delete-audio-btn:hover {
+  color: var(--color-danger);
+}
+
+/* Transcribe Button */
+.transcribe-btn {
+  color: var(--color-text-muted);
+}
+
+.transcribe-btn:hover {
+  color: var(--color-accent-primary);
+}
+
+.transcribe-btn.transcribing {
+  color: var(--color-warning);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* Audio Player Wrapper */
+.audio-player-wrapper {
+  margin-bottom: 0.75rem;
+}
+
+/* Transcript Display */
+.audio-transcript {
+  background: var(--color-bg-tertiary);
+  padding: 0.75rem 1rem;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  margin-top: -0.25rem;
+  border-top: 1px solid var(--color-bg-secondary);
+}
+
+.transcript-loading {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.transcript-text {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle-track {
+  width: 52px;
+  height: 28px;
+  background: var(--color-bg-tertiary);
+  border-radius: 14px;
+  position: relative;
+  transition: background var(--transition-normal);
+  border: 1px solid var(--glass-border);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-accent-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-toggle-thumb.dark {
+  left: 3px;
+}
+
+.theme-toggle-thumb.light {
+  left: 25px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.theme-toggle-btn:hover .theme-toggle-track {
+  border-color: var(--color-accent-primary);
+}
+
+.theme-toggle-btn:hover .theme-toggle-thumb {
+  transform: scale(1.05);
+}
