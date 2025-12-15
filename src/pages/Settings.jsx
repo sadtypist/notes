@@ -10,7 +10,9 @@ const Settings = () => {
     const [key, setKey] = useState(localStorage.getItem('easeNotes_supabaseKey') || '');
 
     // Google Drive State
-    const [gClientId, setGClientId] = useState(localStorage.getItem('easeNotes_gClientId') || '');
+    // Try to get from Env Var first, then LocalStorage
+    const envClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const [gClientId, setGClientId] = useState(envClientId || localStorage.getItem('easeNotes_gClientId') || '');
     const [isGDriveConnected, setIsGDriveConnected] = useState(false);
     const [driveBackups, setDriveBackups] = useState([]);
     const [driveStatus, setDriveStatus] = useState('');
@@ -43,11 +45,15 @@ const Settings = () => {
 
     // Google Drive Handlers
     const handleConnectDrive = async () => {
-        if (!gClientId) return alert("Please enter a Google Client ID first.");
+        const clientIdToUse = gClientId || envClientId;
+        if (!clientIdToUse) return alert("Please configure VITE_GOOGLE_CLIENT_ID in .env or enter it manually.");
+
         setDriveStatus("Initializing...");
         try {
-            localStorage.setItem('easeNotes_gClientId', gClientId);
-            await driveService.init(gClientId);
+            if (!envClientId) {
+                localStorage.setItem('easeNotes_gClientId', gClientId);
+            }
+            await driveService.init(clientIdToUse);
             await driveService.signIn();
             setIsGDriveConnected(true);
             setDriveStatus("Connected! Fetching backups...");
@@ -251,27 +257,48 @@ const Settings = () => {
 
                             {!isGDriveConnected ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter Google Client ID"
-                                        value={gClientId}
-                                        onChange={(e) => setGClientId(e.target.value)}
-                                        className="input"
-                                        style={{ fontSize: '0.9rem' }}
-                                    />
+                                    {!envClientId && (
+                                        <div style={{ marginBottom: '0.5rem' }}>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter Google Client ID"
+                                                value={gClientId}
+                                                onChange={(e) => setGClientId(e.target.value)}
+                                                className="input"
+                                                style={{ fontSize: '0.9rem' }}
+                                            />
+                                            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+                                                Tip: Add <code>VITE_GOOGLE_CLIENT_ID</code> to <code>.env</code> to hide this.
+                                            </p>
+                                        </div>
+                                    )}
+
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <button
                                             onClick={handleConnectDrive}
                                             className="btn"
-                                            style={{ background: 'var(--color-accent-primary)', color: 'white' }}
+                                            style={{
+                                                background: 'white',
+                                                color: '#3c4043',
+                                                border: '1px solid #dadce0',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.75rem',
+                                                fontWeight: '500',
+                                                padding: '0.5rem 1rem'
+                                            }}
                                         >
-                                            <FiCloud /> Connect Drive
+                                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '18px', height: '18px' }} />
+                                            <span>Sign in with Google</span>
                                         </button>
                                         <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{driveStatus}</span>
                                     </div>
-                                    <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
-                                        Don't have a Client ID? <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Create one here</a> (Enable "Google Drive API" first).
-                                    </p>
+
+                                    {!envClientId && (
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+                                            Don't have a Client ID? <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>Create one here</a> (Enable "Google Drive API" first).
+                                        </p>
+                                    )}
                                 </div>
                             ) : (
                                 <div>
