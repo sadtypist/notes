@@ -5,7 +5,7 @@ import DeleteModal from '../components/DeleteModal';
 import DrawingCanvas from '../components/DrawingCanvas';
 import ToolbarButton from '../components/ToolbarButton'; // Imported
 import { FiArrowLeft, FiBold, FiItalic, FiUnderline, FiTrash2, FiMic, FiPenTool } from 'react-icons/fi';
-import { BsPin, BsPinFill } from 'react-icons/bs';
+import { BsPin, BsPinFill, BsStar, BsStarFill } from 'react-icons/bs';
 import { RiSubscript, RiSuperscript } from 'react-icons/ri';
 import VoiceRecorder from '../components/VoiceRecorder';
 import AudioPlayer from '../components/AudioPlayer';
@@ -15,7 +15,7 @@ import CategorySelector from '../components/CategorySelector';
 const Editor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { notes, updateNote, deleteNote, togglePin, addAudioToNote, deleteAudioFromNote, updateAudioTranscript } = useNotes();
+    const { notes, updateNote, deleteNote, togglePin, toggleFavorite, addAudioToNote, deleteAudioFromNote, updateAudioTranscript } = useNotes();
 
     // Derived state for note
     const note = notes.find(n => n.id === id);
@@ -145,6 +145,14 @@ const Editor = () => {
                     {new Date(note.updatedAt).toLocaleTimeString()}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button
+                        onClick={() => { toggleFavorite(note.id); }}
+                        className="btn btn-ghost"
+                        style={{ color: note.isFavorite ? 'var(--color-warning)' : 'var(--color-text-muted)' }}
+                        title={note.isFavorite ? 'Unfavorite' : 'Favorite'}
+                    >
+                        {note.isFavorite ? <BsStarFill /> : <BsStar />}
+                    </button>
                     <button
                         onClick={() => { togglePin(note.id); }}
                         className="btn btn-ghost"

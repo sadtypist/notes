@@ -112,7 +112,15 @@ const supabaseAdapter = {
             console.error('Supabase fetch error:', error);
             throw error;
         }
-        return data;
+        // Map snake_case to camelCase for frontend consistency
+        return data.map(n => ({
+            ...n,
+            isPinned: n.is_pinned,
+            isFavorite: n.is_favorite,
+            createdAt: n.created_at,
+            updatedAt: n.updated_at,
+            // local adapter uses 'tags', supabase 'tags' is jsonb or array, which maps directly usually
+        }));
     },
 
     saveNote: async (note, userId) => {
@@ -124,7 +132,8 @@ const supabaseAdapter = {
             title: note.title,
             content: note.content,
             tags: note.tags || [], // Ensure array
-            is_pinned: note.isPinned || false, // Mapping camelCase to snake_case usually needed for DB
+            is_pinned: note.isPinned || false,
+            is_favorite: note.isFavorite || false,
             user_id: userId,
             updated_at: new Date().toISOString()
         };
@@ -145,6 +154,7 @@ const supabaseAdapter = {
         return {
             ...data,
             isPinned: data.is_pinned,
+            isFavorite: data.is_favorite,
             createdAt: data.created_at,
             updatedAt: data.updated_at
         };
@@ -157,7 +167,7 @@ const supabaseAdapter = {
 
         await supabase
             .from('notes')
-            .update({ deleted_at: new Date().toISOString(), is_pinned: false })
+            .update({ deleted_at: new Date().toISOString(), is_pinned: false, is_favorite: false })
             .eq('id', id)
             .eq('user_id', userId);
     },

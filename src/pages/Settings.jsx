@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload } from 'react-icons/fi';
+import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload, FiType } from 'react-icons/fi';
 import db from '../services/db';
 import { driveService } from '../services/GoogleDriveService';
 
@@ -18,6 +18,23 @@ const Settings = () => {
     const [driveStatus, setDriveStatus] = useState('');
 
     const [activeTab, setActiveTab] = useState('cloud'); // 'cloud', 'data', 'general'
+
+    // Font Size State
+    const [fontSize, setFontSize] = useState(() => localStorage.getItem('easeNotes_fontSize') || 'medium');
+
+    // Apply Font Size
+    useLayoutEffect(() => {
+        const root = document.documentElement;
+        let size = '16px'; // default (medium)
+        if (fontSize === 'small') size = '14px';
+        if (fontSize === 'large') size = '18px';
+        if (fontSize === 'xl') size = '20px';
+
+        root.style.setProperty('--base-font-size', size);
+        localStorage.setItem('easeNotes_fontSize', fontSize);
+        // We might need to ensure --base-font-size is used in global CSS on body font-size
+        document.body.style.fontSize = size;
+    }, [fontSize]);
 
     // Initialize tab from URL
     useEffect(() => {
@@ -447,6 +464,60 @@ const Settings = () => {
                 {/* General Tab */}
                 {activeTab === 'general' && (
                     <div className="animate-fade-in">
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <FiType /> Typography
+                            </h3>
+                            <p style={{ marginBottom: '1rem', color: 'var(--color-text-secondary)' }}>
+                                Adjust the base font size for the application.
+                            </p>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-bg-secondary)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                                <button
+                                    onClick={() => setFontSize('small')}
+                                    className={`btn ${fontSize === 'small' ? 'active' : 'btn-ghost'}`}
+                                    style={{
+                                        background: fontSize === 'small' ? 'var(--color-accent-primary)' : 'transparent',
+                                        color: fontSize === 'small' ? 'white' : 'var(--color-text-primary)'
+                                    }}
+                                >
+                                    Small
+                                </button>
+                                <button
+                                    onClick={() => setFontSize('medium')}
+                                    className={`btn ${fontSize === 'medium' ? 'active' : 'btn-ghost'}`}
+                                    style={{
+                                        background: fontSize === 'medium' ? 'var(--color-accent-primary)' : 'transparent',
+                                        color: fontSize === 'medium' ? 'white' : 'var(--color-text-primary)'
+                                    }}
+                                >
+                                    Medium
+                                </button>
+                                <button
+                                    onClick={() => setFontSize('large')}
+                                    className={`btn ${fontSize === 'large' ? 'active' : 'btn-ghost'}`}
+                                    style={{
+                                        background: fontSize === 'large' ? 'var(--color-accent-primary)' : 'transparent',
+                                        color: fontSize === 'large' ? 'white' : 'var(--color-text-primary)'
+                                    }}
+                                >
+                                    Large
+                                </button>
+                                <button
+                                    onClick={() => setFontSize('xl')}
+                                    className={`btn ${fontSize === 'xl' ? 'active' : 'btn-ghost'}`}
+                                    style={{
+                                        background: fontSize === 'xl' ? 'var(--color-accent-primary)' : 'transparent',
+                                        color: fontSize === 'xl' ? 'white' : 'var(--color-text-primary)'
+                                    }}
+                                >
+                                    Extra Large
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style={{ height: '1px', background: 'var(--glass-border)', margin: '2rem 0' }}></div>
+
                         <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Appearance</h3>
                         <p style={{ color: 'var(--color-text-secondary)' }}>
                             The application theme currently follows your system preferences (Dark/Light).

@@ -150,6 +150,14 @@ export const NotesProvider = ({ children }) => {
         await addNote(updatedNote);
     };
 
+    const toggleFavorite = async (id) => {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+
+        const updatedNote = { ...note, isFavorite: !note.isFavorite, updatedAt: new Date().toISOString() };
+        await addNote(updatedNote);
+    };
+
     // Auto-cleanup functionality (Client side check)
     useEffect(() => {
         if (!loading && notes.length > 0) {
@@ -208,6 +216,7 @@ export const NotesProvider = ({ children }) => {
             emptyTrash,
             getNote,
             togglePin,
+            toggleFavorite,
             addAudioToNote,
             deleteAudioFromNote,
             updateAudioTranscript

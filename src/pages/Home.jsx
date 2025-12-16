@@ -3,15 +3,15 @@ import { useNotes } from '../context/NotesContext';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiUser, FiFolder } from 'react-icons/fi';
-import { BsPin, BsPinFill } from 'react-icons/bs';
+import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiUser, FiFolder, FiStar } from 'react-icons/fi';
+import { BsPin, BsPinFill, BsStar, BsStarFill } from 'react-icons/bs';
 import ThemeToggle from '../components/ThemeToggle';
 import TemplateModal from '../components/TemplateModal';
 import DeleteModal from '../components/DeleteModal';
 import { getCategoryById } from '../data/categories';
 
 const Home = () => {
-    const { filteredNotes, setSearchQuery, deleteNote, addNote, togglePin } = useNotes();
+    const { filteredNotes, setSearchQuery, deleteNote, addNote, togglePin, toggleFavorite } = useNotes();
     const { user } = useUser();
     const { isDark } = useTheme();
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ const Home = () => {
 
         // Folder check
         if (location.pathname === '/favorites') {
-            if (!note.isPinned) return false;
+            if (!note.isFavorite) return false;
         } else if (categoryId) {
             if (!note.tags || !note.tags.includes(categoryId)) return false;
         }
@@ -197,6 +197,14 @@ const Home = () => {
                                     {new Date(note.updatedAt).toLocaleDateString()}
                                 </span>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); toggleFavorite(note.id); }}
+                                        className="btn-ghost"
+                                        style={{ padding: '0.25rem', color: note.isFavorite ? 'var(--color-warning)' : 'var(--color-text-muted)' }}
+                                        title={note.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                                    >
+                                        {note.isFavorite ? <BsStarFill /> : <BsStar />}
+                                    </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); togglePin(note.id); }}
                                         className="btn-ghost"
