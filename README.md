@@ -8,6 +8,7 @@
 
 ## ✨ Key Features
 
+- **Ultimate Theme System**: Choose from 25+ premium themes or build your own with the custom theme creator.
 - **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
 - **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
 - **Voice Memos**: Record audio notes directly within your documents.
