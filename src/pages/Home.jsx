@@ -13,7 +13,7 @@ import { getCategoryById } from '../data/categories';
 const Home = () => {
     const { filteredNotes, setSearchQuery, deleteNote, addNote, togglePin, toggleFavorite } = useNotes();
     const { user } = useUser();
-    const { isDark } = useTheme();
+    // const { isDark } = useTheme(); // Unused
     const navigate = useNavigate();
     const location = useLocation();
     const { categoryId } = useParams();
@@ -62,7 +62,6 @@ const Home = () => {
                 <div>
                     <h1 style={{
                         fontSize: '2rem',
-                        fontWeight: '800',
                         fontWeight: '800',
                         background: 'var(--header-gradient)',
                         WebkitBackgroundClip: 'text',

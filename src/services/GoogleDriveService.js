@@ -4,7 +4,7 @@ const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/res
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 let tokenClient;
-let gapiInited = false;
+// let gapiInited = false; // Unused
 let gisInited = false;
 
 // Create script tag helper
