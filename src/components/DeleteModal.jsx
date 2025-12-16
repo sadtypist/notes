@@ -71,22 +71,24 @@ const DeleteModal = ({ isOpen, onClose, onMoveToTrash, onDeletePermanently }) =>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <button
-                        onClick={onMoveToTrash}
-                        className="btn"
-                        style={{
-                            background: 'var(--color-bg-tertiary)',
-                            color: 'var(--color-text-primary)',
-                            justifyContent: 'flex-start',
-                            padding: '1rem'
-                        }}
-                    >
-                        <FiClock size={20} />
-                        <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontWeight: '600' }}>Move to Trash</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Automatically deleted after 72 hours</div>
-                        </div>
-                    </button>
+                    {onMoveToTrash && (
+                        <button
+                            onClick={onMoveToTrash}
+                            className="btn"
+                            style={{
+                                background: 'var(--color-bg-tertiary)',
+                                color: 'var(--color-text-primary)',
+                                justifyContent: 'flex-start',
+                                padding: '1rem'
+                            }}
+                        >
+                            <FiClock size={20} />
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{ fontWeight: '600' }}>Move to Trash</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Automatically deleted after 72 hours</div>
+                            </div>
+                        </button>
+                    )}
 
                     <button
                         onClick={onDeletePermanently}

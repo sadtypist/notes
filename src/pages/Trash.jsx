@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNotes } from '../context/NotesContext';
 import { FiTrash2, FiRefreshCw, FiAlertTriangle, FiClock } from 'react-icons/fi';
+import DeleteModal from '../components/DeleteModal';
 
 
 const Trash = () => {
     const { trashNotes, restoreNote, deleteNote, emptyTrash } = useNotes();
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, noteId: null });
 
     const calculateTimeRemaining = (deletedAt) => {
         const deletedDate = new Date(deletedAt);
@@ -100,7 +102,7 @@ const Trash = () => {
                                 height: '220px',
                                 position: 'relative',
                                 overflow: 'hidden',
-                                border: '1px solid var(--color-danger)30',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
                                 opacity: 0.8
                             }}
                         >
@@ -166,7 +168,7 @@ const Trash = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        if (confirm('Delete permanently?')) deleteNote(note.id, true);
+                                        setDeleteModal({ isOpen: true, noteId: note.id });
                                     }}
                                     className="btn btn-ghost"
                                     style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', color: 'var(--color-danger)' }}
@@ -179,6 +181,16 @@ const Trash = () => {
                     ))
                 )}
             </div>
+
+            <DeleteModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ isOpen: false, noteId: null })}
+                onDeletePermanently={() => {
+                    deleteNote(deleteModal.noteId, true);
+                    setDeleteModal({ isOpen: false, noteId: null });
+                }}
+            // No onMoveToTrash passed here
+            />
         </div>
     );
 };
