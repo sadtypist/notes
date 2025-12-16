@@ -5,6 +5,7 @@ export const DEFAULT_THEMES = [
         id: 'midnight-slate',
         name: 'Midnight Slate (Default)',
         type: 'dark',
+        pair: 'clean-slate',
         colors: {
             '--color-bg-primary': '#0f172a',
             '--color-bg-secondary': '#1e293b',
@@ -23,6 +24,7 @@ export const DEFAULT_THEMES = [
         id: 'obsidian-dreams',
         name: 'Obsidian Dreams',
         type: 'dark',
+        pair: 'sky-blue',
         colors: {
             '--color-bg-primary': '#0b0c10',
             '--color-bg-secondary': '#1f2833',
@@ -41,6 +43,7 @@ export const DEFAULT_THEMES = [
         id: 'deep-ocean',
         name: 'Deep Ocean',
         type: 'dark',
+        pair: 'sky-blue',
         colors: {
             '--color-bg-primary': '#001e3c',
             '--color-bg-secondary': '#0a1929',
@@ -59,6 +62,7 @@ export const DEFAULT_THEMES = [
         id: 'cyberpunk-neon',
         name: 'Cyberpunk Neon',
         type: 'dark',
+        pair: 'lemon-drop',
         colors: {
             '--color-bg-primary': '#050505',
             '--color-bg-secondary': '#121212',
@@ -77,6 +81,7 @@ export const DEFAULT_THEMES = [
         id: 'dracula',
         name: 'Vampire\'s Keep',
         type: 'dark',
+        pair: 'rose-garden',
         colors: {
             '--color-bg-primary': '#282a36',
             '--color-bg-secondary': '#44475a',
@@ -95,6 +100,7 @@ export const DEFAULT_THEMES = [
         id: 'forest-night',
         name: 'Forest Night',
         type: 'dark',
+        pair: 'minty-fresh',
         colors: {
             '--color-bg-primary': '#1b262c',
             '--color-bg-secondary': '#0f4c39',
@@ -113,6 +119,7 @@ export const DEFAULT_THEMES = [
         id: 'royal-purple',
         name: 'Royal Purple',
         type: 'dark',
+        pair: 'lavender-mist',
         colors: {
             '--color-bg-primary': '#240046',
             '--color-bg-secondary': '#3c096c',
@@ -131,6 +138,7 @@ export const DEFAULT_THEMES = [
         id: 'coffee-bean',
         name: 'Coffee Bean',
         type: 'dark',
+        pair: 'sepia-reader',
         colors: {
             '--color-bg-primary': '#3e2723',
             '--color-bg-secondary': '#4e342e',
@@ -149,6 +157,7 @@ export const DEFAULT_THEMES = [
         id: 'space-gray',
         name: 'Space Gray',
         type: 'dark',
+        pair: 'corporate-gray',
         colors: {
             '--color-bg-primary': '#263238',
             '--color-bg-secondary': '#37474f',
@@ -167,6 +176,7 @@ export const DEFAULT_THEMES = [
         id: 'crimson-dark',
         name: 'Crimson Dark',
         type: 'dark',
+        pair: 'rose-garden',
         colors: {
             '--color-bg-primary': '#2b0505',
             '--color-bg-secondary': '#5c0000',
@@ -185,6 +195,7 @@ export const DEFAULT_THEMES = [
         id: 'mono-dark',
         name: 'Monolith',
         type: 'dark',
+        pair: 'high-contrast-light',
         colors: {
             '--color-bg-primary': '#000000',
             '--color-bg-secondary': '#1a1a1a',
@@ -203,6 +214,7 @@ export const DEFAULT_THEMES = [
         id: 'blue-lagoon',
         name: 'Blue Lagoon',
         type: 'dark',
+        pair: 'sky-blue',
         colors: {
             '--color-bg-primary': '#002b36',
             '--color-bg-secondary': '#073642',
@@ -221,6 +233,7 @@ export const DEFAULT_THEMES = [
         id: 'synthwave',
         name: 'Synthwave',
         type: 'dark',
+        pair: 'pastel-dream',
         colors: {
             '--color-bg-primary': '#2b213a',
             '--color-bg-secondary': '#241b2f',
@@ -241,6 +254,7 @@ export const DEFAULT_THEMES = [
         id: 'clean-slate',
         name: 'Clean Slate (Default Light)',
         type: 'light',
+        pair: 'midnight-slate',
         colors: {
             '--color-bg-primary': '#f8fafc',
             '--color-bg-secondary': '#ffffff',
@@ -259,6 +273,7 @@ export const DEFAULT_THEMES = [
         id: 'paper-white',
         name: 'Paper White',
         type: 'light',
+        pair: 'coffee-bean',
         colors: {
             '--color-bg-primary': '#fdfbf7',
             '--color-bg-secondary': '#ffffff',
@@ -277,6 +292,7 @@ export const DEFAULT_THEMES = [
         id: 'sky-blue',
         name: 'Sky Blue',
         type: 'light',
+        pair: 'deep-ocean',
         colors: {
             '--color-bg-primary': '#e1f5fe',
             '--color-bg-secondary': '#b3e5fc',
@@ -295,6 +311,7 @@ export const DEFAULT_THEMES = [
         id: 'rose-garden',
         name: 'Rose Garden',
         type: 'light',
+        pair: 'crimson-dark',
         colors: {
             '--color-bg-primary': '#fff1f2',
             '--color-bg-secondary': '#ffe4e6',
@@ -313,6 +330,7 @@ export const DEFAULT_THEMES = [
         id: 'lavender-mist',
         name: 'Lavender Mist',
         type: 'light',
+        pair: 'royal-purple',
         colors: {
             '--color-bg-primary': '#f3e8ff',
             '--color-bg-secondary': '#e9d5ff',
@@ -331,6 +349,7 @@ export const DEFAULT_THEMES = [
         id: 'minty-fresh',
         name: 'Minty Fresh',
         type: 'light',
+        pair: 'forest-night',
         colors: {
             '--color-bg-primary': '#f0fdf4',
             '--color-bg-secondary': '#dcfce7',
@@ -349,6 +368,7 @@ export const DEFAULT_THEMES = [
         id: 'solar-flare',
         name: 'Solar Flare',
         type: 'light',
+        pair: 'coffee-bean',
         colors: {
             '--color-bg-primary': '#fff7ed',
             '--color-bg-secondary': '#ffedd5',
@@ -367,6 +387,7 @@ export const DEFAULT_THEMES = [
         id: 'lemon-drop',
         name: 'Lemon Drop',
         type: 'light',
+        pair: 'cyberpunk-neon',
         colors: {
             '--color-bg-primary': '#fefce8',
             '--color-bg-secondary': '#fef9c3',
@@ -385,6 +406,7 @@ export const DEFAULT_THEMES = [
         id: 'sepia-reader',
         name: 'Sepia Reader',
         type: 'light',
+        pair: 'coffee-bean',
         colors: {
             '--color-bg-primary': '#f4ecd8',
             '--color-bg-secondary': '#e9e1cc',
@@ -403,6 +425,7 @@ export const DEFAULT_THEMES = [
         id: 'corporate-gray',
         name: 'Corporate Gray',
         type: 'light',
+        pair: 'space-gray',
         colors: {
             '--color-bg-primary': '#eeeeee',
             '--color-bg-secondary': '#ffffff',
@@ -421,6 +444,7 @@ export const DEFAULT_THEMES = [
         id: 'pastel-dream',
         name: 'Pastel Dream',
         type: 'light',
+        pair: 'synthwave',
         colors: {
             '--color-bg-primary': '#fff0f5',
             '--color-bg-secondary': '#e6e6fa',
@@ -439,6 +463,7 @@ export const DEFAULT_THEMES = [
         id: 'sandy-beach',
         name: 'Sandy Beach',
         type: 'light',
+        pair: 'coffee-bean',
         colors: {
             '--color-bg-primary': '#fff8e1',
             '--color-bg-secondary': '#ffecb3',
@@ -457,6 +482,7 @@ export const DEFAULT_THEMES = [
         id: 'high-contrast-light',
         name: 'High Contrast (Light)',
         type: 'light',
+        pair: 'mono-dark',
         colors: {
             '--color-bg-primary': '#ffffff',
             '--color-bg-secondary': '#ffffff',

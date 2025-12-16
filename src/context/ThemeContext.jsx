@@ -77,12 +77,32 @@ export const ThemeProvider = ({ children }) => {
         }
     };
 
+    const toggleTheme = () => {
+        const current = getThemeObject(themeId);
+
+        // 1. Check for specific pair
+        if (current.pair) {
+            applyTheme(current.pair);
+            return;
+        }
+
+        // 2. Determine target type
+        const targetType = current.type === 'dark' ? 'light' : 'dark';
+
+        // 3. Find default for that type
+        const defaultForType = DEFAULT_THEMES.find(t => t.type === targetType && (t.id === 'midnight-slate' || t.id === 'clean-slate'));
+
+        applyTheme(defaultForType ? defaultForType.id : (targetType === 'dark' ? 'midnight-slate' : 'clean-slate'));
+    };
+
     const value = {
         themeId,
+        theme: getThemeObject(themeId).type, // 'dark' or 'light'
         currentTheme: getThemeObject(themeId),
         defaultThemes: DEFAULT_THEMES,
         customThemes,
         applyTheme,
+        toggleTheme,
         createCustomTheme,
         deleteCustomTheme
     };
