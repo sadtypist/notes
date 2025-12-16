@@ -2,7 +2,9 @@
 
 **EaseNotes** is a powerful, beautiful, and offline-first note-taking application built with React and Vite. It combines rich text part-editing, voice memos, digital sketching, and seamless cloud backups into a premium user experience.
 
-![EaseNotes Preview](https://via.placeholder.com/800x400?text=EaseNotes+App+Preview)
+🚀 **Deployed on Netlify**: [https://easenotes.netlify.app](https://easenotes.netlify.app)
+
+
 
 ## ✨ Key Features
 

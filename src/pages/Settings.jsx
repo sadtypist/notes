@@ -3,6 +3,236 @@ import { useLocation } from 'react-router-dom';
 import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload, FiType } from 'react-icons/fi';
 import db from '../services/db';
 import { driveService } from '../services/GoogleDriveService';
+import { useTheme } from '../context/ThemeContext';
+
+const ThemePicker = () => {
+    const { themeId, defaultThemes, customThemes, applyTheme, deleteCustomTheme } = useTheme();
+    const [isCreating, setIsCreating] = useState(false);
+
+    return (
+        <div>
+            {isCreating ? (
+                <ThemeCreator onCancel={() => setIsCreating(false)} />
+            ) : (
+                <>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h4 style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>Preset Themes</h4>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+                            {defaultThemes.map(theme => (
+                                <ThemeBubble
+                                    key={theme.id}
+                                    theme={theme}
+                                    isActive={themeId === theme.id}
+                                    onClick={() => applyTheme(theme.id)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h4 style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>My Themes</h4>
+                            <button
+                                onClick={() => setIsCreating(true)}
+                                className="btn"
+                                style={{ fontSize: '0.85rem', padding: '0.4rem 0.8rem', background: 'var(--color-bg-tertiary)' }}
+                            >
+                                <FiPlus /> Create New
+                            </button>
+                        </div>
+
+                        {customThemes.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+                                {customThemes.map(theme => (
+                                    <ThemeBubble
+                                        key={theme.id}
+                                        theme={theme}
+                                        isActive={themeId === theme.id}
+                                        onClick={() => applyTheme(theme.id)}
+                                        onDelete={() => {
+                                            if (window.confirm(`Delete theme "${theme.name}"?`)) deleteCustomTheme(theme.id);
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <p style={{ fontStyle: 'italic', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                                You haven't created any custom themes yet.
+                            </p>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
+const ThemeBubble = ({ theme, isActive, onClick, onDelete }) => {
+    return (
+        <div
+            onClick={onClick}
+            style={{
+                cursor: 'pointer',
+                position: 'relative',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                border: isActive ? '2px solid var(--color-accent-primary)' : '1px solid var(--glass-border)',
+                transition: 'transform 0.2s',
+                transform: isActive ? 'scale(1.02)' : 'scale(1)'
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+            onMouseLeave={e => !isActive && (e.currentTarget.style.transform = 'scale(1)')}
+        >
+            {/* Preview Area */}
+            <div style={{ height: '80px', background: theme.colors['--color-bg-primary'], position: 'relative' }}>
+                {/* Secondary BG Strip */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '30px', background: theme.colors['--color-bg-secondary'] }}></div>
+                {/* Accent Dot */}
+                <div style={{
+                    position: 'absolute', top: '10px', right: '10px',
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: theme.colors['--color-accent-primary'],
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                }}></div>
+                {/* Text Lines */}
+                <div style={{ position: 'absolute', top: '20px', left: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ width: '40px', height: '4px', background: theme.colors['--color-text-primary'], borderRadius: '2px', opacity: 0.8 }}></div>
+                    <div style={{ width: '25px', height: '4px', background: theme.colors['--color-text-secondary'], borderRadius: '2px', opacity: 0.6 }}></div>
+                </div>
+            </div>
+
+            {/* Label */}
+            <div style={{ padding: '0.5rem', background: 'var(--color-bg-secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: isActive ? '600' : '400', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {theme.name}
+                </span>
+                {onDelete && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                        style={{ color: 'var(--color-danger)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                    >
+                        <FiTrash2 size={12} />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+const ThemeCreator = ({ onCancel }) => {
+    const { createCustomTheme } = useTheme();
+    const [name, setName] = useState('My Custom Theme');
+    const [colors, setColors] = useState({
+        '--color-bg-primary': '#1e1e1e',
+        '--color-bg-secondary': '#252526',
+        '--color-bg-tertiary': '#333333',
+        '--color-text-primary': '#ffffff',
+        '--color-text-secondary': '#cccccc',
+        '--color-text-muted': '#888888',
+        '--color-accent-primary': '#007acc',
+        '--color-accent-hover': '#0098ff',
+        '--color-accent-subtle': 'rgba(0, 122, 204, 0.1)',
+        '--glass-bg': 'rgba(30, 30, 30, 0.8)',
+        '--glass-border': 'rgba(255, 255, 255, 0.1)',
+    });
+
+    const handleChange = (key, val) => {
+        setColors(prev => ({ ...prev, [key]: val }));
+    };
+
+    const handleSave = () => {
+        if (!name.trim()) return alert("Please name your theme.");
+        const newTheme = {
+            id: `custom-${Date.now()}`,
+            name,
+            type: 'dark', // defaulting to dark for simplicity in meta, essentially determines data-theme attr
+            colors
+        };
+        createCustomTheme(newTheme);
+        onCancel();
+    };
+
+    return (
+        <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-accent-primary)' }}>
+            <h3 style={{ marginBottom: '1.5rem' }}>Create New Theme</h3>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Theme Name</label>
+                <input
+                    className="input"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="e.g., Neon Nights"
+                />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                {/* Backgrounds */}
+                <div>
+                    <h4 style={{ fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Backgrounds</h4>
+                    <ColorInput label="Primary BG" varName="--color-bg-primary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Secondary BG" varName="--color-bg-secondary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Tertiary BG" varName="--color-bg-tertiary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Glass BG (Opacity ignored in native picker)" varName="--glass-bg" colors={colors} onChange={handleChange} type="text" />
+                </div>
+                {/* Foreground */}
+                <div>
+                    <h4 style={{ fontSize: '0.9rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Foreground</h4>
+                    <ColorInput label="Primary Text" varName="--color-text-primary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Secondary Text" varName="--color-text-secondary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Accent Main" varName="--color-accent-primary" colors={colors} onChange={handleChange} />
+                    <ColorInput label="Accent Hover" varName="--color-accent-hover" colors={colors} onChange={handleChange} />
+                </div>
+            </div>
+
+            {/* Preview Box */}
+            <div style={{ padding: '1rem', background: colors['--color-bg-primary'], borderRadius: 'var(--radius-md)', marginBottom: '2rem', border: '1px solid var(--glass-border)' }}>
+                <h4 style={{ color: colors['--color-text-primary'] }}>Theme Preview</h4>
+                <p style={{ color: colors['--color-text-secondary'] }}>This is how your text will look.</p>
+                <button style={{
+                    marginTop: '1rem', padding: '0.5rem 1rem', borderRadius: '4px',
+                    background: colors['--color-accent-primary'], color: 'white', border: 'none'
+                }}>
+                    Primary Button
+                </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+                <button onClick={handleSave} className="btn-primary" style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer' }}>
+                    Save Theme
+                </button>
+                <button onClick={onCancel} className="btn-ghost" style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer' }}>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const ColorInput = ({ label, varName, colors, onChange, type = "color" }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+        <label style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>{label}</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {type === 'color' && (
+                <input
+                    type="color"
+                    value={colors[varName]}
+                    onChange={e => onChange(varName, e.target.value)}
+                    style={{ width: '30px', height: '30px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                />
+            )}
+            {/* Fallback text input for precise hex or rgba editing */}
+            <input
+                type="text"
+                value={colors[varName]}
+                onChange={e => onChange(varName, e.target.value)}
+                style={{ width: '90px', padding: '4px', fontSize: '0.8rem', background: 'var(--color-bg-tertiary)', border: 'none', color: 'var(--color-text-primary)', borderRadius: '4px' }}
+            />
+        </div>
+    </div>
+);
 
 const Settings = () => {
     const location = useLocation();
@@ -519,10 +749,9 @@ const Settings = () => {
                         <div style={{ height: '1px', background: 'var(--glass-border)', margin: '2rem 0' }}></div>
 
                         <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Appearance</h3>
-                        <p style={{ color: 'var(--color-text-secondary)' }}>
-                            The application theme currently follows your system preferences (Dark/Light).
-                        </p>
-                        {/* Future theme toggle implementation */}
+
+                        {/* Theme Picker Component */}
+                        <ThemePicker />
                     </div>
                 )}
             </div>
