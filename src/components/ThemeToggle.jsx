@@ -13,7 +13,9 @@ const ThemeToggle = () => {
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
             <div className="theme-toggle-track">
-                {theme === 'dark' ? <FiSun /> : <FiMoon />}
+                <div className={`theme-toggle-thumb ${theme}`}>
+                    {theme === 'dark' ? <FiMoon /> : <FiSun />}
+                </div>
             </div>
         </button>
     );

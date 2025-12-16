@@ -41,7 +41,9 @@
   --glass-bg: rgba(30, 41, 59, 0.7);
   --glass-border: rgba(255, 255, 255, 0.05);
 
-  --header-gradient: linear-gradient(to right, #fff, #94a3b8);
+  /* Gradient for text, dynamic based on theme lightness is handled by components or we can invert colors here */
+  /* For dark themes: white to grey. For light themes: dark grey to accent. */
+  --header-gradient: linear-gradient(to right, var(--color-text-primary), var(--color-text-muted));
 
   font-size: var(--base-font-size, 16px);
 }
