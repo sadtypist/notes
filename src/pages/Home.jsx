@@ -46,7 +46,11 @@ const Home = () => {
 
     const handleCreateNote = async (template) => {
         // Create note with template content
-        const newId = await addNote(template.title, template.content);
+        const newId = await addNote({
+            title: template.title,
+            content: template.content,
+            tags: []
+        });
         navigate(`/note/${newId}`);
     };
 

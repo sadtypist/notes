@@ -114,7 +114,6 @@ const AudioPlayer = ({ audioData, onDelete, onTranscribe }) => {
             };
 
             recognition.onerror = (event) => {
-                // console.log('Speech recognition error:', event.error);
                 // For any error, try to restart if audio is still playing
                 if (!isAudioEnded && ['no-speech', 'audio-capture', 'network', 'aborted'].includes(event.error)) {
                     clearTimeout(restartTimeout);
