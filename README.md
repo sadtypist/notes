@@ -1,16 +1,73 @@
-# React + Vite
+# EaseNotes 📝
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**EaseNotes** is a powerful, beautiful, and offline-first note-taking application built with React and Vite. It combines rich text part-editing, voice memos, digital sketching, and seamless cloud backups into a premium user experience.
 
-Currently, two official plugins are available:
+![EaseNotes Preview](https://via.placeholder.com/800x400?text=EaseNotes+App+Preview)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Key Features
 
-## React Compiler
+- **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
+- **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
+- **Voice Memos**: Record audio notes directly within your documents.
+- **Digital Sketching**: Visual thinker? Draw and sketch ideas directly on an infinite canvas.
+- **Organization**: Keep things tidy with Folders, Pinned Notes, and Favorites. Includes a Trash Bin for safe deletion.
+- **Cloud Sync & Backup**: 
+  - **Google Drive**: Securely backup and restore your notes to your personal Google Drive.
+  - **Supabase**: Real-time sync capabilities (configurable).
+- **Privacy First**: All data is stored locally in your browser by default. You own your data.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend**: React 18, Vite
+- **Styling**: Modern CSS3 (Variables, Glassmorphism design)
+- **Icons**: React Icons (Feather, Bootstrap Icons)
+- **State Management**: React Context API
+- **Routing**: React Router v6
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/sadtypist/notes.git
+   cd notes
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+   The app will open at `http://localhost:5173`.
+
+## ⚙️ Configuration
+
+### Environment Variables
+To enable Google Drive integration, create a `.env` file in the root directory:
+
+```env
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+```
+
+## 📦 Building for Production
+
+To create a production-ready build:
+
+```bash
+npm run build
+```
+
+The output will be in the `dist/` directory, ready to be deployed to Vercel, Netlify, or any static host.
+
+## 📄 License
+
+This project is licensed under the MIT License.
