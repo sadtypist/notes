@@ -203,7 +203,7 @@ export const DEFAULT_THEMES = [
             '--color-text-primary': '#ffffff',
             '--color-text-secondary': '#cccccc',
             '--color-text-muted': '#666666',
-            '--color-accent-primary': '#ffffff',
+            '--color-accent-primary': '#333333',
             '--color-accent-hover': '#eeeeee',
             '--color-accent-subtle': 'rgba(255, 255, 255, 0.1)',
             '--glass-bg': 'rgba(26, 26, 26, 0.9)',
