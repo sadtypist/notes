@@ -208,13 +208,11 @@ const Editor = () => {
                 marginBottom: '1rem',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                opacity: isFocusMode ? 0.2 : 1, // Fade out when focused
-                transition: 'opacity 0.3s',
-                zIndex: 10,
-                position: 'relative'
+                // Removed opacity/z-index fading to ensure no input blocking. 
+                // Zen mode now primarily focuses on the layout (Sidebar removal + text centering).
             }}>
                 {/* Formatting Buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isFocusMode ? 0 : 1, transition: 'opacity 0.3s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <ToolbarButton icon={<FiBold />} onClick={() => handleFormat('bold')} tooltip="Bold" />
                     <ToolbarButton icon={<FiItalic />} onClick={() => handleFormat('italic')} tooltip="Italic" />
                     <ToolbarButton icon={<FiUnderline />} onClick={() => handleFormat('underline')} tooltip="Underline" />

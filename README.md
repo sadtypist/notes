@@ -2,7 +2,7 @@
 
 **EaseNotes** is a powerful, beautiful, and offline-first note-taking application built with React and Vite. It combines rich text part-editing, voice memos, digital sketching, and customizable Kanban boards into a premium user experience.
 
-🚀 **Live Demo**: [http://sadtypist.github.io/notes/](http://sadtypist.github.io/notes/)
+🚀 **Live Demo**: [https://sadtypist.github.io/notes/](https://sadtypist.github.io/notes/)
 
 > ⚠️ **Note**: The original Netlify deployment is currently on hold. Use the GitHub Pages link above!
 
