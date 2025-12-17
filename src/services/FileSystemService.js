@@ -1,61 +1,12 @@
-import { get, set, del } from 'idb-keyval'; // We might not have this, so I will write a simple IDB helper instead to avoid deps.
+import { get, set, del } from 'idb-keyval';
 
 /*
  * FileSystemService handles interaction with the local file system
  * via the File System Access API.
- * It uses IndexedDB to persist the directory handle.
+ * It uses IndexedDB to persist the directory handle via idb-keyval.
  */
 
-const DB_NAME = 'EaseNotesDB';
-const STORE_NAME = 'handles';
 const HANDLE_KEY = 'rootDirectory';
-
-// Simple IDB Wrapper
-const idb = {
-    open: () => {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 1);
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    db.createObjectStore(STORE_NAME);
-                }
-            };
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    },
-    get: async (key) => {
-        const db = await idb.open();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, 'readonly');
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.get(key);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    },
-    set: async (key, value) => {
-        const db = await idb.open();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.put(value, key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        });
-    },
-    del: async (key) => {
-        const db = await idb.open();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            const store = tx.objectStore(STORE_NAME);
-            const request = store.delete(key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        });
-    }
-};
 
 export const fileSystemService = {
     directoryHandle: null,
@@ -63,7 +14,7 @@ export const fileSystemService = {
     // Initialize: try to load handle from IDB
     init: async () => {
         try {
-            const handle = await idb.get(HANDLE_KEY);
+            const handle = await get(HANDLE_KEY);
             if (handle) {
                 fileSystemService.directoryHandle = handle;
                 // We cannot verify permission immediately without user interaction usually,
@@ -84,7 +35,7 @@ export const fileSystemService = {
                 id: 'ease-notes-root' // remebers default path
             });
             fileSystemService.directoryHandle = handle;
-            await idb.set(HANDLE_KEY, handle);
+            await set(HANDLE_KEY, handle);
             return handle.name;
         } catch (err) {
             if (err.name !== 'AbortError') console.error(err);
@@ -94,7 +45,7 @@ export const fileSystemService = {
 
     disconnect: async () => {
         fileSystemService.directoryHandle = null;
-        await idb.del(HANDLE_KEY);
+        await del(HANDLE_KEY);
     },
 
     // Verify permission (must be called before read/write if state is unknown)

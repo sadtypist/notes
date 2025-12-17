@@ -58,7 +58,8 @@ export const NotesProvider = ({ children }) => {
                     }
                     setFolders(defaultFolders);
                 }
-                console.error("Failed to fetch data:", err);
+            } catch (error) {
+                console.error("Failed to fetch folders", error);
             } finally {
                 setLoading(false);
             }
