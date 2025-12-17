@@ -210,14 +210,11 @@ const Editor = () => {
                 flexWrap: 'wrap',
                 opacity: isFocusMode ? 0.2 : 1, // Fade out when focused
                 transition: 'opacity 0.3s',
+                zIndex: 10,
+                position: 'relative'
             }}>
-                <div style={{
-                    opacity: isFocusMode ? 0 : 1,
-                    transition: 'opacity 0.3s',
-                    display: 'contents' // Use contents to apply opacity to children if wrapper is tricky
-                }}>
-                    {/* Actually, let's just use the wrapper opacity. User can hover to restore? No, explicit toggle is better. */}
-                    {/* For now, just dim it. */}
+                {/* Formatting Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isFocusMode ? 0 : 1, transition: 'opacity 0.3s' }}>
                     <ToolbarButton icon={<FiBold />} onClick={() => handleFormat('bold')} tooltip="Bold" />
                     <ToolbarButton icon={<FiItalic />} onClick={() => handleFormat('italic')} tooltip="Italic" />
                     <ToolbarButton icon={<FiUnderline />} onClick={() => handleFormat('underline')} tooltip="Underline" />
@@ -294,7 +291,11 @@ const Editor = () => {
                     textAlign: isFocusMode ? 'left' : 'left', // Keep text left aligned usually
                     maxWidth: isFocusMode ? '100%' : '100%', // Container handles width
                     margin: '0 auto',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    userSelect: 'text',
+                    cursor: 'text',
+                    position: 'relative',
+                    zIndex: 1
                 }}
                 placeholder="Start typing..."
                 className="editor-content"

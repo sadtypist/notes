@@ -26,3 +26,36 @@ Host directly on GitHub.
     *   Go to your GitHub Repository -> **Settings** -> **Pages**.
     *   Under **"Build and deployment"**, select **Source** -> **GitHub Actions**.
     *   (Note: configuring the standard "Deploy from Branch" requires pushing the `dist` folder, which is messier. We recommend Vercel for the easiest setup with React apps).
+
+---
+
+## 🌐 Custom Domains on GitHub Pages
+
+If you own a domain (e.g., `my-notes-app.com`) and want to use it with GitHub Pages:
+
+### Step 1: Configure DNS (at your Domain Registrar)
+Go to GoDaddy, Namecheap, Cloudflare, etc., and edit your DNS records.
+
+**For a root domain (e.g., `example.com`):**
+Create **4 A Records** pointing to GitHub's IPs:
+*   `185.199.108.153`
+*   `185.199.109.153`
+*   `185.199.110.153`
+*   `185.199.111.153`
+*   Also create a **CNAME Record** for `www` pointing to `<your-github-username>.github.io`.
+
+**For a subdomain (e.g., `notes.example.com`):**
+Create a **CNAME Record**:
+*   Host: `notes`
+*   Value: `<your-github-username>.github.io`
+
+### Step 2: Configure GitHub
+1.  Go to your Repository **Settings** -> **Pages**.
+2.  Scroll down to **Custom domain**.
+3.  Type your domain (e.g., `my-notes-app.com`) and click **Save**.
+4.  GitHub will create a `CNAME` file in your repository automatically.
+5.  Check the box **"Enforce HTTPS"** (this might take up to 24 hours to become clickable).
+
+### ⚠️ Important for React/Vite Apps
+Since this is a Single Page App (SPA), GitHub Pages might give 404s on refresh if you don't handle routing.
+*   **The Fix**: A common trick is to copy `index.html` to `404.html` in your `public` folder, or rely on HashRouter (which we are already using in `App.jsx`, so you are safe!).
