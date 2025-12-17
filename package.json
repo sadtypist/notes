@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.87.1",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
+    "idb-keyval": "^6.2.2",
     "jspdf": "^3.0.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
