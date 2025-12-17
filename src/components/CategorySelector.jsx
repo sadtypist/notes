@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { categories, getCategoryById } from '../data/categories';
+import { useNotes } from '../context/NotesContext';
 import { FiX, FiPlus, FiCheck } from 'react-icons/fi';
 
 const CategorySelector = ({ selectedCategories = [], onChange, compact = false }) => {
+    const { folders } = useNotes();
     const [isOpen, setIsOpen] = useState(false);
+
+    const getFolderById = (id) => {
+        if (!folders) return null;
+        return folders.find(f => f.id === id);
+    };
 
     const handleToggleCategory = (categoryId) => {
         if (selectedCategories.includes(categoryId)) {
@@ -51,7 +57,7 @@ const CategorySelector = ({ selectedCategories = [], onChange, compact = false }
                 ) : (
                     <>
                         {selectedCategories.map(catId => {
-                            const cat = getCategoryById(catId);
+                            const cat = getFolderById(catId);
                             if (!cat) return null;
                             return (
                                 <span
@@ -144,8 +150,12 @@ const CategorySelector = ({ selectedCategories = [], onChange, compact = false }
                         }}>
                             Categories
                         </div>
-                        {categories.map(cat => {
+                        {folders && folders.map(cat => {
                             const isSelected = selectedCategories.includes(cat.id);
+                            // Use category properties for display
+                            const displayName = cat.categoryName || cat.name;
+                            const displayColor = cat.categoryColor || cat.color;
+
                             return (
                                 <button
                                     key={cat.id}
@@ -158,7 +168,7 @@ const CategorySelector = ({ selectedCategories = [], onChange, compact = false }
                                         padding: '0.5rem',
                                         borderRadius: 'var(--radius-sm)',
                                         border: 'none',
-                                        background: isSelected ? cat.bgColor : 'transparent',
+                                        background: isSelected ? `${displayColor}26` : 'transparent',
                                         cursor: 'pointer',
                                         textAlign: 'left',
                                         transition: 'background var(--transition-fast)',
@@ -174,17 +184,17 @@ const CategorySelector = ({ selectedCategories = [], onChange, compact = false }
                                         width: '12px',
                                         height: '12px',
                                         borderRadius: '50%',
-                                        backgroundColor: cat.color,
+                                        backgroundColor: displayColor,
                                     }} />
                                     <span style={{
                                         flex: 1,
                                         color: 'var(--color-text-primary)',
                                         fontSize: '0.875rem',
                                     }}>
-                                        {cat.name}
+                                        {displayName}
                                     </span>
                                     {isSelected && (
-                                        <FiCheck size={14} style={{ color: cat.color }} />
+                                        <FiCheck size={14} style={{ color: displayColor }} />
                                     )}
                                 </button>
                             );

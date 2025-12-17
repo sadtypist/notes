@@ -12,25 +12,48 @@ export const useNotes = () => useContext(NotesContext);
 export const NotesProvider = ({ children }) => {
     // Initial state empty, fetch on load
     const [notes, setNotes] = useState([]);
+    const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(true);
     const { user, isAuthenticated } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
 
-    // 1. Fetch notes on load or user change
+    // 1. Fetch notes and folders on load or user change
     useEffect(() => {
-        const fetchNotes = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
                 const userId = isAuthenticated && user ? user.id : 'local-guest';
-                const fetched = await db.getNotes(userId);
-                setNotes(fetched);
+
+                // Fetch Notes
+                const fetchedNotes = await db.getNotes(userId);
+                setNotes(fetchedNotes);
+
+                // Fetch Folders
+                const fetchedFolders = await db.getFolders(userId);
+                if (fetchedFolders) {
+                    setFolders(fetchedFolders);
+                } else {
+                    // Seed defaults if null (first run local)
+                    const defaultFolders = [
+                        { id: 'f-personal', name: 'Personal', color: '#3b82f6', bgColor: '#3b82f626', userId },
+                        { id: 'f-work', name: 'Work', color: '#10b981', bgColor: '#10b98126', userId },
+                        { id: 'f-ideas', name: 'Ideas', color: '#f59e0b', bgColor: '#f59e0b26', userId }
+                    ];
+                    // Save defaults one by one or batch if db supported it. 
+                    // db.saveFolder saves individual.
+                    for (const f of defaultFolders) {
+                        await db.saveFolder(f, userId);
+                    }
+                    setFolders(defaultFolders);
+                }
+
             } catch (err) {
-                console.error("Failed to fetch notes:", err);
+                console.error("Failed to fetch data:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchNotes();
+        fetchData();
     }, [isAuthenticated, user]);
 
     const addNote = async (note) => {
@@ -45,6 +68,7 @@ export const NotesProvider = ({ children }) => {
             tags: note.tags || [],
             isPinned: note.isPinned || false,
             audioRecordings: note.audioRecordings || [],
+            folderId: note.folderId || null // Ensure folderId is handled
         };
 
         const savedNote = await db.saveNote(noteToSave, userId);
@@ -158,6 +182,31 @@ export const NotesProvider = ({ children }) => {
         await addNote(updatedNote);
     };
 
+    // --- Folders Logic ---
+    const addFolder = async (name, color, categoryName, categoryColor) => {
+        const userId = isAuthenticated && user ? user.id : 'local-guest';
+        const newFolder = {
+            id: uuidv4(),
+            name,
+            color,
+            bgColor: `${color}26`, // 15% opacity hex roughly
+            categoryName: categoryName || name, // Fallback to folder name
+            categoryColor: categoryColor || color // Fallback to folder color
+        };
+        await db.saveFolder(newFolder, userId);
+        setFolders(prev => [...prev, newFolder]);
+        return newFolder;
+    };
+
+    const deleteFolder = async (id) => {
+        const userId = isAuthenticated && user ? user.id : 'local-guest';
+        await db.deleteFolder(id, userId);
+        setFolders(prev => prev.filter(f => f.id !== id));
+        // Also update notes? Optionally clear folderId from notes.
+        // For now, we'll leave notes orphan or they just won't show in the folder.
+        // Better UX would be to move them to "All Notes" (which is null folderId).
+    };
+
     // Auto-cleanup functionality (Client side check)
     useEffect(() => {
         if (!loading && notes.length > 0) {
@@ -168,10 +217,6 @@ export const NotesProvider = ({ children }) => {
                 if (note.deletedAt) {
                     const deletedDate = new Date(note.deletedAt);
                     if (now - deletedDate > threeDaysMs) {
-                        // FIX: calling deleteNote directly inside useEffect might refer to stale closure if not careful,
-                        // but here deleteNote uses user from context which is stable-ish.
-                        // Ideally we should use the function from the scope.
-                        // To allow this to be correct, we just let it run.
                         const userId = isAuthenticated && user ? user.id : 'local-guest';
                         await db.deleteNote(note.id, userId);
                         setNotes(prev => prev.filter(n => n.id !== note.id));
@@ -179,7 +224,6 @@ export const NotesProvider = ({ children }) => {
                 }
             });
         }
-        // removing deleteNote from dep array intentionally to avoid loop, or we must memoize deleteNote
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, notes]);
 
@@ -204,6 +248,7 @@ export const NotesProvider = ({ children }) => {
     return (
         <NotesContext.Provider value={{
             notes,
+            folders,
             filteredNotes,
             trashNotes,
             searchQuery,
@@ -219,7 +264,9 @@ export const NotesProvider = ({ children }) => {
             toggleFavorite,
             addAudioToNote,
             deleteAudioFromNote,
-            updateAudioTranscript
+            updateAudioTranscript,
+            addFolder,
+            deleteFolder
         }}>
             {children}
         </NotesContext.Provider>

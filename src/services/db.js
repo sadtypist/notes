@@ -221,7 +221,9 @@ const supabaseAdapter = {
             // Calculate bgColor from color if not stored, or store it. 
             // Simplified: we'll compute bgColor on front end or store it.
             // Let's assume we store it as bg_color if possible, or derive it.
-            bgColor: f.bg_color || `${f.color_hex}26` // 15% opacity hex roughly
+            bgColor: f.bg_color || `${f.color_hex}26`, // 15% opacity hex roughly
+            categoryName: f.category_name || f.name,
+            categoryColor: f.category_color || f.color_hex
         }));
     },
 
@@ -236,6 +238,8 @@ const supabaseAdapter = {
                 name: folder.name,
                 color_hex: folder.color,
                 bg_color: folder.bgColor,
+                category_name: folder.categoryName,
+                category_color: folder.categoryColor,
                 user_id: userId
             });
 

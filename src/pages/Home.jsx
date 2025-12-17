@@ -8,10 +8,9 @@ import { BsPin, BsPinFill, BsStar, BsStarFill } from 'react-icons/bs';
 import ThemeToggle from '../components/ThemeToggle';
 import TemplateModal from '../components/TemplateModal';
 import DeleteModal from '../components/DeleteModal';
-import { getCategoryById } from '../data/categories';
 
 const Home = () => {
-    const { filteredNotes, setSearchQuery, deleteNote, addNote, togglePin, toggleFavorite } = useNotes();
+    const { filteredNotes, folders, setSearchQuery, deleteNote, addNote, togglePin, toggleFavorite } = useNotes();
     const { user } = useUser();
     // const { isDark } = useTheme(); // Unused
     const navigate = useNavigate();
@@ -19,6 +18,12 @@ const Home = () => {
     const { categoryId } = useParams();
     const [showTemplateModal, setShowTemplateModal] = useState(false);
     const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, noteId: null });
+
+    // Helper to get folder info
+    const getFolderById = (id) => {
+        if (!folders) return null;
+        return folders.find(f => f.id === id);
+    };
 
     // Filter Logic
     const displayNotes = filteredNotes.filter(note => {
@@ -38,7 +43,7 @@ const Home = () => {
     const getPageTitle = () => {
         if (location.pathname === '/favorites') return 'Favorites';
         if (categoryId) {
-            const cat = getCategoryById(categoryId);
+            const cat = getFolderById(categoryId);
             return cat ? cat.name : 'Folder';
         }
         return 'All Notes';
@@ -49,7 +54,7 @@ const Home = () => {
         const newId = await addNote({
             title: template.title,
             content: template.content,
-            tags: []
+            tags: categoryId ? [categoryId] : [] // Auto-tag if inside a folder
         });
         navigate(`/note/${newId}`);
     };
@@ -70,7 +75,7 @@ const Home = () => {
                         alignItems: 'center',
                         gap: '0.75rem'
                     }}>
-                        {categoryId && <FiFolder className="animate-fade-in" size={28} style={{ color: getCategoryById(categoryId)?.color }} />}
+                        {categoryId && <FiFolder className="animate-fade-in" size={28} style={{ color: getFolderById(categoryId)?.color }} />}
                         {getPageTitle()}
                     </h1>
                     <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
@@ -158,8 +163,13 @@ const Home = () => {
                             {note.tags && note.tags.length > 0 && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.5rem' }}>
                                     {note.tags.slice(0, 3).map(tagId => {
-                                        const cat = getCategoryById(tagId);
+                                        const cat = getFolderById(tagId);
                                         if (!cat) return null;
+                                        // Use category properties
+                                        const displayName = cat.categoryName || cat.name;
+                                        const displayColor = cat.categoryColor || cat.color;
+                                        const displayBg = `${displayColor}26`;
+
                                         return (
                                             <span
                                                 key={tagId}
@@ -168,11 +178,11 @@ const Home = () => {
                                                     borderRadius: '999px',
                                                     fontSize: '0.65rem',
                                                     fontWeight: '500',
-                                                    backgroundColor: cat.bgColor,
-                                                    color: cat.color,
+                                                    backgroundColor: displayBg,
+                                                    color: displayColor,
                                                 }}
                                             >
-                                                {cat.name}
+                                                {displayName}
                                             </span>
                                         );
                                     })}
@@ -282,4 +292,3 @@ const Home = () => {
 };
 
 export default Home;
-
