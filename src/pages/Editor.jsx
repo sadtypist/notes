@@ -133,7 +133,8 @@ const Editor = () => {
                 date: new Date().toISOString()
             };
             const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
-            const url = `${window.location.origin}/#/share?data=${compressed}`;
+            const baseUrl = `${window.location.origin}${window.location.pathname}`;
+            const url = `${baseUrl}#/share?data=${compressed}`;
             setShareUrl(url);
             setShowShareModal(true);
             setCopiedLink(false);
