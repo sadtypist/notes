@@ -210,12 +210,10 @@ const Editor = () => {
                 flexWrap: 'wrap',
                 opacity: isFocusMode ? 0.2 : 1, // Fade out when focused
                 transition: 'opacity 0.3s',
-                pointerEvents: isFocusMode ? 'none' : 'auto' // Prevent accidental clicks if fully faded? Maybe just low opacity.
             }}>
                 <div style={{
                     opacity: isFocusMode ? 0 : 1,
                     transition: 'opacity 0.3s',
-                    pointerEvents: isFocusMode ? 'none' : 'auto',
                     display: 'contents' // Use contents to apply opacity to children if wrapper is tricky
                 }}>
                     {/* Actually, let's just use the wrapper opacity. User can hover to restore? No, explicit toggle is better. */}
