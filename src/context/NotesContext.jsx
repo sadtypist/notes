@@ -210,6 +210,18 @@ export const NotesProvider = ({ children }) => {
         return newFolder;
     };
 
+    const updateFolder = async (id, updates) => {
+        const userId = isAuthenticated && user ? user.id : 'local-guest';
+        const folder = folders.find(f => f.id === id);
+        if (!folder) return;
+
+        const updatedFolder = { ...folder, ...updates };
+        await db.saveFolder(updatedFolder, userId);
+
+        setFolders(prev => prev.map(f => f.id === id ? updatedFolder : f));
+        return updatedFolder;
+    };
+
     const deleteFolder = async (id) => {
         const userId = isAuthenticated && user ? user.id : 'local-guest';
         await db.deleteFolder(id, userId);
@@ -278,6 +290,7 @@ export const NotesProvider = ({ children }) => {
             deleteAudioFromNote,
             updateAudioTranscript,
             addFolder,
+            updateFolder,
             deleteFolder,
             isLocalSyncConnected
         }}>

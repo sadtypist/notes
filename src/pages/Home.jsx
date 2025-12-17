@@ -9,9 +9,10 @@ import ThemeToggle from '../components/ThemeToggle';
 import TemplateModal from '../components/TemplateModal';
 import DeleteModal from '../components/DeleteModal';
 import NoteCard from '../components/NoteCard';
+import BoardSettingsModal from '../components/BoardSettingsModal';
 
 const Home = () => {
-    const { filteredNotes, folders, setSearchQuery, deleteNote, addNote, togglePin, toggleFavorite } = useNotes();
+    const { filteredNotes, folders, setSearchQuery, deleteNote, addNote, updateFolder, togglePin, toggleFavorite } = useNotes();
     const { user } = useUser();
     // const { isDark } = useTheme(); // Unused
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Home = () => {
     const [showTemplateModal, setShowTemplateModal] = useState(false);
     const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, noteId: null });
     const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'board'
+    const [showBoardSettings, setShowBoardSettings] = useState(false);
 
     // Helper to get folder info
     const getFolderById = (id) => {
@@ -29,16 +31,12 @@ const Home = () => {
 
     // Filter Logic
     const displayNotes = filteredNotes.filter(note => {
-        // 1. If searching, skip folder filtering (or combine them? Usually global search is better)
-        // Let's combine: Search query + Folder constraint
-
         // Folder check
         if (location.pathname === '/favorites') {
             if (!note.isFavorite) return false;
         } else if (categoryId) {
             if (!note.tags || !note.tags.includes(categoryId)) return false;
         }
-
         return true;
     });
 
@@ -61,6 +59,21 @@ const Home = () => {
         navigate(`/note/${newId}`);
     };
 
+    // Active Folder & Board Config
+    const activeFolder = categoryId ? getFolderById(categoryId) : null;
+    const defaultBoardColumns = [
+        { id: 'todo', title: 'To Do', color: '#3b82f6' },
+        { id: 'in-progress', title: 'In Progress', color: '#f59e0b' },
+        { id: 'done', title: 'Done', color: '#10b981' }
+    ];
+    const boardColumns = activeFolder?.boardConfig?.columns || defaultBoardColumns;
+
+    const handleSaveBoardConfig = (config) => {
+        if (activeFolder) {
+            updateFolder(activeFolder.id, { boardConfig: config });
+        }
+    };
+
     return (
         <div className="container" style={{ paddingBottom: '80px', paddingTop: '2rem' }}>
 
@@ -77,8 +90,19 @@ const Home = () => {
                         alignItems: 'center',
                         gap: '0.75rem'
                     }}>
-                        {categoryId && <FiFolder className="animate-fade-in" size={28} style={{ color: getFolderById(categoryId)?.color }} />}
+                        {categoryId && <FiFolder className="animate-fade-in" size={28} style={{ color: activeFolder?.color }} />}
                         {getPageTitle()}
+                        {/* Board Settings Button */}
+                        {categoryId && viewMode === 'board' && (
+                            <button
+                                onClick={() => setShowBoardSettings(true)}
+                                className="btn-ghost animate-fade-in"
+                                style={{ marginLeft: '1rem', padding: '0.5rem', fontSize: '1rem', color: 'var(--color-text-secondary)' }}
+                                title="Board Settings"
+                            >
+                                <FiEdit2 />
+                            </button>
+                        )}
                     </h1>
                     <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
                         {displayNotes.length} notes found
@@ -162,23 +186,17 @@ const Home = () => {
                     paddingBottom: '2rem',
                     minHeight: '60vh'
                 }}>
-                    {['todo', 'in-progress', 'done'].map(status => {
-                        const statusColor = status === 'todo' ? 'var(--color-accent-primary)' : status === 'in-progress' ? '#f59e0b' : '#10b981';
-                        const statusLabel = status === 'todo' ? 'To Do' : status === 'in-progress' ? 'In Progress' : 'Done';
-
+                    {boardColumns.map(col => {
                         return (
                             <div
-                                key={status}
+                                key={col.id}
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={(e) => {
                                     e.preventDefault();
                                     const noteId = e.dataTransfer.getData('noteId');
                                     if (noteId) {
                                         // Update Note Status
-                                        // db should handle partial updates if we use updateNote from context (which calls addNote).
-                                        // We need to call updateNote here.
-                                        // But Home.jsx doesn't destructure updateNote. Need to add it.
-                                        addNote({ ...displayNotes.find(n => n.id === noteId), status });
+                                        addNote({ ...displayNotes.find(n => n.id === noteId), status: col.id });
                                     }
                                 }}
                                 style={{
@@ -187,28 +205,28 @@ const Home = () => {
                                     background: 'var(--color-bg-secondary)',
                                     borderRadius: 'var(--radius-lg)',
                                     padding: '1rem',
-                                    border: `1px solid ${statusColor}40`
+                                    border: `1px solid ${col.color}40`
                                 }}
                             >
                                 <h3 style={{
                                     fontSize: '1rem',
                                     fontWeight: 'bold',
                                     marginBottom: '1rem',
-                                    color: statusColor,
+                                    color: col.color,
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.05em',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between'
                                 }}>
-                                    {statusLabel}
+                                    {col.title}
                                     <span style={{ fontSize: '0.8rem', opacity: 0.7, background: 'var(--color-bg-primary)', padding: '0.2rem 0.6rem', borderRadius: '1rem' }}>
-                                        {displayNotes.filter(n => (n.status || 'todo') === status).length}
+                                        {displayNotes.filter(n => (n.status || 'todo') === col.id).length}
                                     </span>
                                 </h3>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {displayNotes.filter(n => (n.status || 'todo') === status).map(note => (
+                                    {displayNotes.filter(n => (n.status || 'todo') === col.id).map(note => (
                                         <div key={note.id} draggable onDragStart={(e) => e.dataTransfer.setData('noteId', note.id)} style={{ cursor: 'grab' }}>
                                             <NoteCard note={note} navigate={navigate} getFolderById={getFolderById} toggleFavorite={toggleFavorite} togglePin={togglePin} setDeleteModalState={setDeleteModalState} compact />
                                         </div>
@@ -219,7 +237,6 @@ const Home = () => {
                     })}
                 </div>
             )}
-
 
             {/* FAB - Opens Template Modal */}
             <button
@@ -265,6 +282,13 @@ const Home = () => {
                     deleteNote(deleteModalState.noteId, true);
                     setDeleteModalState({ isOpen: false, noteId: null });
                 }}
+            />
+
+            <BoardSettingsModal
+                isOpen={showBoardSettings}
+                onClose={() => setShowBoardSettings(false)}
+                folder={activeFolder}
+                onSave={handleSaveBoardConfig}
             />
 
         </div>
