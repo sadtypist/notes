@@ -1,5 +1,6 @@
 import { getSupabase } from '../lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { fileSystemService } from './FileSystemService';
 
 const LOCAL_STORAGE_KEY = 'easeNotes_notes';
 
@@ -16,14 +17,23 @@ const localAdapter = {
         let notes = saved ? JSON.parse(saved) : [];
         const existingIndex = notes.findIndex(n => n.id === note.id);
 
+        let finalNote;
         if (existingIndex >= 0) {
-            notes[existingIndex] = { ...notes[existingIndex], ...note, updatedAt: new Date().toISOString() };
+            finalNote = { ...notes[existingIndex], ...note, updatedAt: new Date().toISOString() };
+            notes[existingIndex] = finalNote;
         } else {
-            notes.push({ ...note, id: note.id || uuidv4(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            finalNote = { ...note, id: note.id || uuidv4(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+            notes.push(finalNote);
         }
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
-        return existingIndex >= 0 ? notes[existingIndex] : notes[notes.length - 1];
+
+        // FS Sync
+        if (fileSystemService.directoryHandle) {
+            fileSystemService.saveNote(finalNote).catch(err => console.error("FS Sync Error:", err));
+        }
+
+        return finalNote;
     },
 
     deleteNote: async (id) => {
@@ -31,6 +41,11 @@ const localAdapter = {
         let notes = saved ? JSON.parse(saved) : [];
         notes = notes.filter(n => n.id !== id);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+
+        // FS Sync
+        if (fileSystemService.directoryHandle) {
+            fileSystemService.deleteNote(id).catch(err => console.error("FS Delete Error:", err));
+        }
     },
 
     // Soft Delete (Move to Trash)
@@ -40,8 +55,14 @@ const localAdapter = {
         const noteIndex = notes.findIndex(n => n.id === id);
 
         if (noteIndex >= 0) {
-            notes[noteIndex] = { ...notes[noteIndex], deletedAt: new Date().toISOString(), isPinned: false };
+            const updated = { ...notes[noteIndex], deletedAt: new Date().toISOString(), isPinned: false };
+            notes[noteIndex] = updated;
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+
+            // FS Sync (Save the soft-deleted state)
+            if (fileSystemService.directoryHandle) {
+                fileSystemService.saveNote(updated).catch(err => console.error("FS Soft Delete Error:", err));
+            }
         }
     },
 
@@ -55,15 +76,29 @@ const localAdapter = {
             delete rest.deletedAt;
             notes[noteIndex] = rest;
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+
+            // FS Sync
+            if (fileSystemService.directoryHandle) {
+                fileSystemService.saveNote(rest).catch(err => console.error("FS Restore Error:", err));
+            }
         }
     },
 
     emptyTrash: async () => {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
         let notes = saved ? JSON.parse(saved) : [];
+
+        // Find notes to be deleted to remove from FS
+        const toDelete = notes.filter(n => n.deletedAt);
+
         // Keep only active notes
         notes = notes.filter(n => !n.deletedAt);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(notes));
+
+        // FS Sync
+        if (fileSystemService.directoryHandle) {
+            toDelete.forEach(n => fileSystemService.deleteNote(n.id).catch(e => console.error(e)));
+        }
     },
 
     // --- Folders ---
@@ -84,6 +119,12 @@ const localAdapter = {
             folders.push(folder);
         }
         localStorage.setItem('easeNotes_folders', JSON.stringify(folders));
+
+        // FS Sync
+        if (fileSystemService.directoryHandle) {
+            fileSystemService.saveFolders(folders).catch(err => console.error("FS Create Folder Error:", err));
+        }
+
         return folder;
     },
 
@@ -93,6 +134,11 @@ const localAdapter = {
         let folders = JSON.parse(saved);
         folders = folders.filter(f => f.id !== id);
         localStorage.setItem('easeNotes_folders', JSON.stringify(folders));
+
+        // FS Sync
+        if (fileSystemService.directoryHandle) {
+            fileSystemService.saveFolders(folders).catch(err => console.error("FS Delete Folder Error:", err));
+        }
     }
 };
 

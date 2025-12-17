@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload, FiType } from 'react-icons/fi';
+import { FiCloud, FiSave, FiSettings, FiTrash2, FiGrid, FiCheck, FiPlus, FiHardDrive, FiDownload, FiUpload, FiType, FiFolder } from 'react-icons/fi';
 import db from '../services/db';
 import { driveService } from '../services/GoogleDriveService';
+import { fileSystemService } from '../services/FileSystemService';
 import { useTheme } from '../context/ThemeContext';
+import { useNotes } from '../context/NotesContext';
 
 const ThemePicker = () => {
     const { themeId, defaultThemes, customThemes, applyTheme, deleteCustomTheme } = useTheme();
@@ -238,6 +240,7 @@ const Settings = () => {
     const location = useLocation();
     const [url, setUrl] = useState(localStorage.getItem('easeNotes_supabaseUrl') || '');
     const [key, setKey] = useState(localStorage.getItem('easeNotes_supabaseKey') || '');
+    const { isLocalSyncConnected } = useNotes();
 
     // Google Drive State
     // Try to get from Env Var first, then LocalStorage
@@ -493,10 +496,85 @@ const Settings = () => {
                 {/* Cloud Tab */}
                 {activeTab === 'cloud' && (
                     <div className="animate-fade-in">
+
+                        {/* Local Folder Sync Section */}
+                        <div style={{ marginBottom: '3rem', padding: '1.5rem', background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-accent-primary)' }}>
+                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-primary)' }}>
+                                <FiFolder /> Local Folder Sync
+                            </h2>
+                            <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                                Sync your notes directly to a folder on your computer (e.g., inside <strong>OneDrive</strong>, <strong>Dropbox</strong>, or <strong>iCloud</strong>).
+                                No API keys or login required.
+                            </p>
+
+                            {!isLocalSyncConnected ? (
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const name = await fileSystemService.connect();
+                                            if (name) {
+                                                alert(`Connected to folder: ${name}\nNotes will now sync to this folder.`);
+                                                window.location.reload(); // Reload to refresh context state
+                                            }
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert("Failed to connect folder. (Note: Only supported in Chrome/Edge/Opera)");
+                                        }
+                                    }}
+                                    className="btn-primary"
+                                    style={{ padding: '0.75rem 1.5rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                >
+                                    <FiFolder /> Connect Folder
+                                </button>
+                            ) : (
+                                <div>
+                                    <div className="alert-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
+                                        <FiCheck /> Syncing to Local Folder
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <button
+                                            onClick={async () => {
+                                                if (window.confirm("Disconnect folder sync?")) {
+                                                    await fileSystemService.disconnect();
+                                                    window.location.reload();
+                                                }
+                                            }}
+                                            className="btn-ghost"
+                                            style={{ color: 'var(--color-danger)' }}
+                                        >
+                                            Disconnect
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                if (window.confirm("Import all notes from this folder? This will merge with existing notes.")) {
+                                                    try {
+                                                        const { notes } = await fileSystemService.loadAll();
+                                                        // Simple merge logic: iterate and save
+                                                        let count = 0;
+                                                        for (const n of notes) {
+                                                            await db.saveNote(n);
+                                                            count++;
+                                                        }
+                                                        alert(`Imported ${count} notes.`);
+                                                        window.location.reload();
+                                                    } catch (e) {
+                                                        alert("Import failed.");
+                                                    }
+                                                }
+                                            }}
+                                            className="btn-ghost"
+                                        >
+                                            <FiDownload /> Import/Merge
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Google Drive Section */}
-                        <div style={{ marginBottom: '3rem' }}>
+                        <div style={{ marginBottom: '3rem', opacity: 0.7 }}>
                             <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <FiHardDrive /> Google Drive Backup
+                                <FiHardDrive /> Google Drive Backup (Legacy)
                             </h2>
                             <p style={{ marginBottom: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
                                 Securely backup your notes to your personal Google Drive. Requires a Google Client ID.

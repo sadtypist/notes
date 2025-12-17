@@ -16,19 +16,31 @@ export const NotesProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const { user, isAuthenticated } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLocalSyncConnected, setIsLocalSyncConnected] = useState(false);
 
     // 1. Fetch notes and folders on load or user change
     useEffect(() => {
-        const fetchData = async () => {
+        const init = async () => {
             setLoading(true);
+            const userId = isAuthenticated && user ? user.id : 'local-guest';
+
+            // 1. Initialize File System Service (check for existing handle)
+            const hasHandle = await fileSystemService.init();
+            setIsLocalSyncConnected(hasHandle);
+
+            // 2. Load Notes
             try {
-                const userId = isAuthenticated && user ? user.id : 'local-guest';
-
-                // Fetch Notes
                 const fetchedNotes = await db.getNotes(userId);
+                // If we found notes on disk via FS init (and we want to prioritize them or merge), logic would go here.
+                // For now, we stick to db.getNotes which reads LocalStorage/Supabase.
+                // TODO: Optional 'Load from Disk' button in settings could trigger a merge.
                 setNotes(fetchedNotes);
+            } catch (error) {
+                console.error("Failed to fetch notes", error);
+            }
 
-                // Fetch Folders
+            // 3. Load Folders
+            try {
                 const fetchedFolders = await db.getFolders(userId);
                 if (fetchedFolders) {
                     setFolders(fetchedFolders);
@@ -46,8 +58,6 @@ export const NotesProvider = ({ children }) => {
                     }
                     setFolders(defaultFolders);
                 }
-
-            } catch (err) {
                 console.error("Failed to fetch data:", err);
             } finally {
                 setLoading(false);
@@ -266,7 +276,8 @@ export const NotesProvider = ({ children }) => {
             deleteAudioFromNote,
             updateAudioTranscript,
             addFolder,
-            deleteFolder
+            deleteFolder,
+            isLocalSyncConnected
         }}>
             {children}
         </NotesContext.Provider>
