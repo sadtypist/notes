@@ -15,11 +15,7 @@ import Signup from './pages/Signup';
 
 import ErrorBoundary from './components/ErrorBoundary';
 
-import { useUI } from './context/UIContext';
-
-function App() {
-  const { isFocusMode } = useUI();
-
+const App = () => {
   return (
     <ErrorBoundary>
       <Router>
@@ -33,18 +29,15 @@ function App() {
             <ProtectedRoute>
               <div className="app-layout" style={{
                 display: 'flex',
-                maxWidth: isFocusMode ? '900px' : '1400px', // Narrower max-width for focus reading
+                maxWidth: '1400px',
                 margin: '0 auto',
-                gap: isFocusMode ? '0' : '2rem',
-                padding: '0 1rem',
-                transition: 'all 0.3s ease'
+                gap: '2rem',
+                padding: '0 1rem'
               }}>
                 <NetworkStatus />
-                {!isFocusMode && (
-                  <div style={{ width: '250px', flexShrink: 0 }} className="animate-slide-in">
-                    <Sidebar />
-                  </div>
-                )}
+                <div style={{ width: '250px', flexShrink: 0 }} className="animate-slide-in">
+                  <Sidebar />
+                </div>
                 <main style={{ flex: 1, minWidth: 0, transition: 'all 0.3s ease' }}>
                   <Routes>
                     <Route path="/" element={<Home />} />

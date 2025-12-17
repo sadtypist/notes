@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '../context/NotesContext';
-import { useUI } from '../context/UIContext';
 import DeleteModal from '../components/DeleteModal';
 import DrawingCanvas from '../components/DrawingCanvas';
 import ToolbarButton from '../components/ToolbarButton';
@@ -17,7 +16,6 @@ const Editor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { notes, updateNote, deleteNote, togglePin, toggleFavorite, addAudioToNote, deleteAudioFromNote, updateAudioTranscript } = useNotes();
-    const { isFocusMode, toggleFocusMode, setIsFocusMode } = useUI();
 
     // Derived state for note
     const note = notes.find(n => n.id === id);
@@ -44,12 +42,7 @@ const Editor = () => {
         }
     }, [id, note]);
 
-    // Reset Focus Mode when leaving editor
-    useEffect(() => {
-        return () => {
-            setIsFocusMode(false);
-        };
-    }, []);
+
 
     // Apply content to contentEditable div
     useEffect(() => {
@@ -132,28 +125,19 @@ const Editor = () => {
         <div className="container" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
 
             {/* Top Bar */}
-            <div style={{ padding: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: isFocusMode ? 'none' : '1px solid var(--color-bg-tertiary)', transition: 'all 0.3s ease' }}>
-                <button onClick={() => { handleSave(); navigate('/'); }} className="btn btn-ghost" style={{ opacity: isFocusMode ? 0.3 : 1, transition: 'opacity 0.3s' }}>
-                    <FiArrowLeft /> {isFocusMode ? '' : 'Back'}
+            {/* Top Bar */}
+            <div style={{ padding: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-bg-tertiary)' }}>
+                <button onClick={() => { handleSave(); navigate('/'); }} className="btn btn-ghost">
+                    <FiArrowLeft /> Back
                 </button>
 
                 {/* Center Info */}
-                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', opacity: isFocusMode ? 0 : 1, transition: 'opacity 0.3s' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                     {note.updatedAt === note.createdAt ? 'Created ' : 'Edited '}
                     {new Date(note.updatedAt).toLocaleTimeString()}
                 </span>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {/* Focus Toggle */}
-                    <button
-                        onClick={toggleFocusMode}
-                        className="btn btn-ghost"
-                        style={{ color: isFocusMode ? 'var(--color-accent-primary)' : 'var(--color-text-muted)' }}
-                        title={isFocusMode ? 'Exit Zen Mode' : 'Enter Zen Mode'}
-                    >
-                        {isFocusMode ? <FiMinimize /> : <FiMaximize />}
-                    </button>
-
                     <button
                         onClick={() => { toggleFavorite(note.id); }}
                         className="btn btn-ghost"
@@ -191,14 +175,12 @@ const Editor = () => {
                     width: '100%',
                     padding: '1rem 0 0.5rem 0',
                     color: 'var(--color-text-primary)',
-                    outline: 'none',
-                    textAlign: isFocusMode ? 'center' : 'left', // Center in focus mode
-                    transition: 'all 0.3s ease'
+                    outline: 'none'
                 }}
             />
 
             {/* Categories */}
-            <div style={{ marginBottom: '1rem', opacity: isFocusMode ? 0.5 : 1, transition: 'opacity 0.3s', textAlign: isFocusMode ? 'center' : 'left' }}>
+            <div style={{ marginBottom: '1rem' }}>
                 <CategorySelector
                     selectedCategories={categories}
                     onChange={(newCats) => { setCategories(newCats); }}
@@ -292,19 +274,7 @@ const Editor = () => {
                     fontSize: '1.2rem', // Slightly larger in general
                     lineHeight: '1.8',
                     overflowY: 'auto',
-                    paddingBottom: '2rem',
-                    textAlign: isFocusMode ? 'left' : 'left', // Keep text left aligned usually
-                    maxWidth: isFocusMode ? '100%' : '100%', // Container handles width
-                    margin: '0 auto',
-                    transition: 'all 0.3s ease',
-                    userSelect: 'text',
-                    WebkitUserSelect: 'text',
-                    cursor: 'text',
-                    position: 'relative',
-                    zIndex: 1,
-                    color: 'var(--color-text-primary)',
-                    caretColor: 'var(--color-accent-primary)', // Use accent color for visibility
-                    minHeight: '60vh' // Ensure clickable area
+                    paddingBottom: '2rem'
                 }}
                 placeholder="Start typing..."
                 className="editor-content"

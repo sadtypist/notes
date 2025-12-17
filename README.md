@@ -10,7 +10,6 @@
 
 - **Ultimate Theme System**: Choose from 25+ premium themes or build your own with the custom theme creator.
 - **Kanban Boards**: Turn any folder into a project board with fully customizable columns (e.g., "To Do", "In Progress", "Done").
-- **Zen / Focus Mode**: Distraction-free writing mode that hides all UI and centers your content.
 - **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
 - **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
 - **Voice Memos**: Record audio notes directly within your documents.
