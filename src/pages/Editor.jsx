@@ -17,7 +17,7 @@ const Editor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { notes, updateNote, deleteNote, togglePin, toggleFavorite, addAudioToNote, deleteAudioFromNote, updateAudioTranscript } = useNotes();
-    const { isFocusMode, toggleFocusMode } = useUI();
+    const { isFocusMode, toggleFocusMode, setIsFocusMode } = useUI();
 
     // Derived state for note
     const note = notes.find(n => n.id === id);
@@ -43,6 +43,13 @@ const Editor = () => {
             }
         }
     }, [id, note]);
+
+    // Reset Focus Mode when leaving editor
+    useEffect(() => {
+        return () => {
+            setIsFocusMode(false);
+        };
+    }, []);
 
     // Apply content to contentEditable div
     useEffect(() => {
@@ -293,7 +300,9 @@ const Editor = () => {
                     userSelect: 'text',
                     cursor: 'text',
                     position: 'relative',
-                    zIndex: 1
+                    zIndex: 1,
+                    color: 'var(--color-text-primary)',
+                    caretColor: 'var(--color-text-primary)'
                 }}
                 placeholder="Start typing..."
                 className="editor-content"
