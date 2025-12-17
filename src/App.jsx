@@ -20,8 +20,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 const App = () => {
   return (
     <ErrorBoundary>
-      <CommandPalette />
       <Router>
+        <CommandPalette />
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
