@@ -298,11 +298,13 @@ const Editor = () => {
                     margin: '0 auto',
                     transition: 'all 0.3s ease',
                     userSelect: 'text',
+                    WebkitUserSelect: 'text',
                     cursor: 'text',
                     position: 'relative',
                     zIndex: 1,
                     color: 'var(--color-text-primary)',
-                    caretColor: 'var(--color-text-primary)'
+                    caretColor: 'var(--color-accent-primary)', // Use accent color for visibility
+                    minHeight: '60vh' // Ensure clickable area
                 }}
                 placeholder="Start typing..."
                 className="editor-content"
