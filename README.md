@@ -12,6 +12,7 @@
 - **Kanban Boards**: Turn any folder into a project board with fully customizable columns (e.g., "To Do", "In Progress", "Done").
 - **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
 - **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
+- **One-Click Publish**: Share your notes instantly via a unique link (Serverless/Offline-compatible).
 - **Voice Memos**: Record audio notes directly within your documents.
 - **Digital Sketching**: Visual thinker? Draw and sketch ideas directly on an infinite canvas.
 - **Organization**: Keep things tidy with Folders, Pinned Notes, and Favorites. Includes a Trash Bin for safe deletion.

@@ -12,6 +12,7 @@ import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import SharedNote from './pages/SharedNote';
 
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -23,6 +24,7 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/share" element={<SharedNote />} />
 
           {/* Protected Routes */}
           <Route path="/*" element={

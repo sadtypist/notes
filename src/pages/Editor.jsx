@@ -11,6 +11,8 @@ import VoiceRecorder from '../components/VoiceRecorder';
 import AudioPlayer from '../components/AudioPlayer';
 import ExportDropdown from '../components/ExportDropdown';
 import CategorySelector from '../components/CategorySelector';
+import LZString from 'lz-string';
+import { FiShare2, FiCopy, FiX } from 'react-icons/fi';
 
 const Editor = () => {
     const { id } = useParams();
@@ -29,6 +31,9 @@ const Editor = () => {
     const [showRecorder, setShowRecorder] = useState(false);
     const [showCanvas, setShowCanvas] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [shareUrl, setShareUrl] = useState('');
+    const [copiedLink, setCopiedLink] = useState(false);
 
     // Initialize/Reset local state when note ID changes
     useEffect(() => {
@@ -119,6 +124,28 @@ const Editor = () => {
         setShowCanvas(false);
     };
 
+    const handleShare = () => {
+        if (contentRef.current) {
+            const shareData = {
+                title,
+                content: contentRef.current.innerHTML,
+                tags: categories,
+                date: new Date().toISOString()
+            };
+            const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
+            const url = `${window.location.origin}/#/share?data=${compressed}`;
+            setShareUrl(url);
+            setShowShareModal(true);
+            setCopiedLink(false);
+        }
+    };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(shareUrl);
+        setCopiedLink(true);
+    };
+
+
     if (!note) return null;
 
     return (
@@ -153,6 +180,14 @@ const Editor = () => {
                         title={note.isPinned ? 'Unpin note' : 'Pin note'}
                     >
                         {note.isPinned ? <BsPinFill /> : <BsPin />}
+                    </button>
+                    <button
+                        onClick={handleShare}
+                        className="btn btn-ghost"
+                        title="Share Note"
+                        style={{ color: 'var(--color-accent-primary)' }}
+                    >
+                        <FiShare2 />
                     </button>
                     <ExportDropdown title={title} getContent={() => contentRef.current?.innerHTML || ''} />
                     <button onClick={handleDeleteClick} className="btn" style={{ color: 'var(--color-danger)' }}>
@@ -292,6 +327,39 @@ const Editor = () => {
                     onClose={() => setShowCanvas(false)}
                     onSave={handleSaveCanvas}
                 />
+            )}
+
+            {showShareModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                    backdropFilter: 'blur(5px)'
+                }}>
+                    <div style={{
+                        background: 'var(--color-bg-secondary)', padding: '2rem', borderRadius: 'var(--radius-lg)',
+                        width: '90%', maxWidth: '500px', border: '1px solid var(--glass-border)', boxShadow: 'var(--shadow-lg)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ margin: 0 }}>Share this Note</h3>
+                            <button onClick={() => setShowShareModal(false)} className="btn btn-ghost"><FiX /></button>
+                        </div>
+                        <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
+                            Anyone with this link can view a read-only snapshot of your note.
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <input
+                                readOnly
+                                value={shareUrl}
+                                className="input"
+                                style={{ flex: 1, fontSize: '0.9rem' }}
+                                onClick={(e) => e.target.select()}
+                            />
+                            <button onClick={copyToClipboard} className="btn btn-primary">
+                                {copiedLink ? <FiCheck /> : <FiCopy />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
