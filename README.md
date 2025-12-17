@@ -1,14 +1,16 @@
 # EaseNotes 📝
 
-**EaseNotes** is a powerful, beautiful, and offline-first note-taking application built with React and Vite. It combines rich text part-editing, voice memos, digital sketching, and seamless cloud backups into a premium user experience.
+**EaseNotes** is a powerful, beautiful, and offline-first note-taking application built with React and Vite. It combines rich text part-editing, voice memos, digital sketching, and customizable Kanban boards into a premium user experience.
 
-🚀 **Deployed on Netlify**: [https://easenotes.netlify.app](https://easenotes.netlify.app)
+🚀 **Live Demo**: [http://sadtypist.github.io/notes/](http://sadtypist.github.io/notes/)
 
-
+> ⚠️ **Note**: The original Netlify deployment is currently on hold. Use the GitHub Pages link above!
 
 ## ✨ Key Features
 
 - **Ultimate Theme System**: Choose from 25+ premium themes or build your own with the custom theme creator.
+- **Kanban Boards**: Turn any folder into a project board with fully customizable columns (e.g., "To Do", "In Progress", "Done").
+- **Zen / Focus Mode**: Distraction-free writing mode that hides all UI and centers your content.
 - **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
 - **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
 - **Voice Memos**: Record audio notes directly within your documents.
@@ -69,7 +71,7 @@ To create a production-ready build:
 npm run build
 ```
 
-The output will be in the `dist/` directory, ready to be deployed to Vercel, Netlify, or any static host.
+The output will be in the `dist/` directory, ready to be deployed to Vercel, Netlify, or GitHub Pages.
 
 ## 📄 License
 
