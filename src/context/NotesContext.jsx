@@ -231,6 +231,24 @@ export const NotesProvider = ({ children }) => {
         // Better UX would be to move them to "All Notes" (which is null folderId).
     };
 
+    const exportAllData = () => {
+        const data = {
+            notes,
+            folders,
+            exportedAt: new Date().toISOString(),
+            version: '1.0'
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `easenotes-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     // Auto-cleanup functionality (Client side check)
     useEffect(() => {
         if (!loading && notes.length > 0) {
@@ -292,6 +310,9 @@ export const NotesProvider = ({ children }) => {
             addFolder,
             updateFolder,
             deleteFolder,
+            createFolder: addFolder, // Alias for consistency
+            createNote: addNote, // Alias for consistency
+            exportAllData,
             isLocalSyncConnected
         }}>
             {children}

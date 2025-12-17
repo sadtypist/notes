@@ -13,12 +13,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import SharedNote from './pages/SharedNote';
+import CommandPalette from './components/CommandPalette';
 
 import ErrorBoundary from './components/ErrorBoundary';
 
 const App = () => {
   return (
     <ErrorBoundary>
+      <CommandPalette />
       <Router>
         <Routes>
           {/* Public Routes */}
