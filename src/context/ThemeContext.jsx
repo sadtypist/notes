@@ -46,15 +46,28 @@ export const ThemeProvider = ({ children }) => {
         const root = document.documentElement;
 
         // Apply Variables
-        Object.entries(theme.colors).forEach(([key, value]) => {
-            root.style.setProperty(key, value);
-        });
+        try {
+            if (!theme.colors) throw new Error("Invalid theme structure: missing colors");
+            Object.entries(theme.colors).forEach(([key, value]) => {
+                root.style.setProperty(key, value);
+            });
 
-        // Set data-theme attribute (mostly for external CSS hooks if any)
-        root.setAttribute('data-theme', theme.type);
+            // Set data-theme attribute (mostly for external CSS hooks if any)
+            root.setAttribute('data-theme', theme.type);
 
-        // Persist ID
-        localStorage.setItem('easeNotes_themeId', themeId);
+            // Persist ID
+            localStorage.setItem('easeNotes_themeId', themeId);
+        } catch (e) {
+            console.error("Failed to apply theme, reverting to default:", e);
+            // Fallback to safe default
+            const safeTheme = DEFAULT_THEMES[0];
+            setThemeId(safeTheme.id);
+            Object.entries(safeTheme.colors).forEach(([key, value]) => {
+                root.style.setProperty(key, value);
+            });
+            root.setAttribute('data-theme', safeTheme.type);
+            localStorage.setItem('easeNotes_themeId', safeTheme.id);
+        }
     }, [themeId, customThemes]);
 
     // Persist Custom Themes whenever they change

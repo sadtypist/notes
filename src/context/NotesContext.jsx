@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import db from '../services/db';
 import { useUser } from './UserContext';
+import { fileSystemService } from '../services/FileSystemService';
 
 const NotesContext = createContext();
 
@@ -64,7 +65,7 @@ export const NotesProvider = ({ children }) => {
                 setLoading(false);
             }
         };
-        fetchData();
+        init();
     }, [isAuthenticated, user]);
 
     const addNote = async (note) => {
