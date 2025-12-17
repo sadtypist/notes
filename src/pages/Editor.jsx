@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNotes } from '../context/NotesContext';
+import { useUI } from '../context/UIContext';
 import DeleteModal from '../components/DeleteModal';
 import DrawingCanvas from '../components/DrawingCanvas';
-import ToolbarButton from '../components/ToolbarButton'; // Imported
-import { FiArrowLeft, FiBold, FiItalic, FiUnderline, FiTrash2, FiMic, FiPenTool } from 'react-icons/fi';
+import ToolbarButton from '../components/ToolbarButton';
+import { FiArrowLeft, FiBold, FiItalic, FiUnderline, FiTrash2, FiMic, FiPenTool, FiMaximize, FiMinimize } from 'react-icons/fi';
 import { BsPin, BsPinFill, BsStar, BsStarFill } from 'react-icons/bs';
 import { RiSubscript, RiSuperscript } from 'react-icons/ri';
 import VoiceRecorder from '../components/VoiceRecorder';
@@ -16,6 +17,7 @@ const Editor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { notes, updateNote, deleteNote, togglePin, toggleFavorite, addAudioToNote, deleteAudioFromNote, updateAudioTranscript } = useNotes();
+    const { isFocusMode, toggleFocusMode } = useUI();
 
     // Derived state for note
     const note = notes.find(n => n.id === id);
@@ -33,32 +35,24 @@ const Editor = () => {
     // Initialize/Reset local state when note ID changes
     useEffect(() => {
         if (id) {
-            // We use getNote just to check existence or we can rely on 'note' derived from 'notes'
-            // Using 'note' from 'notes' context is reactive.
             if (note) {
                 setTitle(note.title);
                 setCategories(note.tags || []);
                 setInitialContent(note.content);
-                setContentLoaded(false); // Valid to reset this to trigger content injection
-            } else if (!note) {
-                // If notes are loaded but note not found, redirect.
-                // Depending on loading state of notes, this might be premature.
-                // Assuming notes are loaded relatively fast or we need a loading state check.
+                setContentLoaded(false);
             }
         }
-    }, [id, note]); // Depend on 'note' object reference
+    }, [id, note]);
 
-    // Apply content to contentEditable div after it's mounted
+    // Apply content to contentEditable div
     useEffect(() => {
         if (contentRef.current && initialContent !== undefined && !contentLoaded) {
             contentRef.current.innerHTML = initialContent;
             setContentLoaded(true);
         }
-        // ESLint might warn about setContentLoaded, but it's conditioned on !contentLoaded
-
     }, [initialContent, contentLoaded]);
 
-    // Auto-save when categories change
+    // Auto-save categories
     useEffect(() => {
         if (note && contentLoaded) {
             updateNote(note.id, { tags: categories });
@@ -66,8 +60,6 @@ const Editor = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [categories]);
 
-    // Handle auto-saving content on blur or specialized interval could go here
-    // For now we save on change of title and content blur
     const handleSave = () => {
         if (note && contentRef.current) {
             updateNote(note.id, {
@@ -88,13 +80,13 @@ const Editor = () => {
     };
 
     const handleMoveToTrash = () => {
-        deleteNote(note.id, false); // Soft delete
+        deleteNote(note.id, false);
         setDeleteModalOpen(false);
         navigate('/');
     };
 
     const handleDeletePermanently = () => {
-        deleteNote(note.id, true); // Hard delete
+        deleteNote(note.id, true);
         setDeleteModalOpen(false);
         navigate('/');
     };
@@ -102,7 +94,6 @@ const Editor = () => {
     const handleRecordingComplete = (audioData) => {
         addAudioToNote(note.id, audioData);
         setShowRecorder(false);
-        // Note updates automatically via context
     };
 
     const handleDeleteAudio = (audioId) => {
@@ -121,10 +112,8 @@ const Editor = () => {
             img.style.borderRadius = 'var(--radius-md)';
             img.style.boxShadow = 'var(--shadow-md)';
             img.style.margin = '1rem 0';
-
             contentRef.current.appendChild(img);
             contentRef.current.appendChild(document.createElement('div'));
-
             handleSave();
         }
         setShowCanvas(false);
@@ -136,15 +125,28 @@ const Editor = () => {
         <div className="container" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
 
             {/* Top Bar */}
-            <div style={{ padding: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-bg-tertiary)' }}>
-                <button onClick={() => { handleSave(); navigate('/'); }} className="btn btn-ghost">
-                    <FiArrowLeft /> Back
+            <div style={{ padding: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: isFocusMode ? 'none' : '1px solid var(--color-bg-tertiary)', transition: 'all 0.3s ease' }}>
+                <button onClick={() => { handleSave(); navigate('/'); }} className="btn btn-ghost" style={{ opacity: isFocusMode ? 0.3 : 1, transition: 'opacity 0.3s' }}>
+                    <FiArrowLeft /> {isFocusMode ? '' : 'Back'}
                 </button>
-                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+
+                {/* Center Info */}
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', opacity: isFocusMode ? 0 : 1, transition: 'opacity 0.3s' }}>
                     {note.updatedAt === note.createdAt ? 'Created ' : 'Edited '}
                     {new Date(note.updatedAt).toLocaleTimeString()}
                 </span>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {/* Focus Toggle */}
+                    <button
+                        onClick={toggleFocusMode}
+                        className="btn btn-ghost"
+                        style={{ color: isFocusMode ? 'var(--color-accent-primary)' : 'var(--color-text-muted)' }}
+                        title={isFocusMode ? 'Exit Zen Mode' : 'Enter Zen Mode'}
+                    >
+                        {isFocusMode ? <FiMinimize /> : <FiMaximize />}
+                    </button>
+
                     <button
                         onClick={() => { toggleFavorite(note.id); }}
                         className="btn btn-ghost"
@@ -182,12 +184,14 @@ const Editor = () => {
                     width: '100%',
                     padding: '1rem 0 0.5rem 0',
                     color: 'var(--color-text-primary)',
-                    outline: 'none'
+                    outline: 'none',
+                    textAlign: isFocusMode ? 'center' : 'left', // Center in focus mode
+                    transition: 'all 0.3s ease'
                 }}
             />
 
             {/* Categories */}
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1rem', opacity: isFocusMode ? 0.5 : 1, transition: 'opacity 0.3s', textAlign: isFocusMode ? 'center' : 'left' }}>
                 <CategorySelector
                     selectedCategories={categories}
                     onChange={(newCats) => { setCategories(newCats); }}
@@ -195,7 +199,7 @@ const Editor = () => {
                 />
             </div>
 
-            {/* Toolbar */}
+            {/* Toolbar - Optional: Hide in Zen Mode? Let's keep it but fade it */}
             <div className="glass-panel" style={{
                 display: 'flex',
                 gap: '0.5rem',
@@ -203,41 +207,53 @@ const Editor = () => {
                 borderRadius: 'var(--radius-md)',
                 marginBottom: '1rem',
                 alignItems: 'center',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                opacity: isFocusMode ? 0.2 : 1, // Fade out when focused
+                transition: 'opacity 0.3s',
+                pointerEvents: isFocusMode ? 'none' : 'auto' // Prevent accidental clicks if fully faded? Maybe just low opacity.
             }}>
-                <ToolbarButton icon={<FiBold />} onClick={() => handleFormat('bold')} tooltip="Bold" />
-                <ToolbarButton icon={<FiItalic />} onClick={() => handleFormat('italic')} tooltip="Italic" />
-                <ToolbarButton icon={<FiUnderline />} onClick={() => handleFormat('underline')} tooltip="Underline" />
+                <div style={{
+                    opacity: isFocusMode ? 0 : 1,
+                    transition: 'opacity 0.3s',
+                    pointerEvents: isFocusMode ? 'none' : 'auto',
+                    display: 'contents' // Use contents to apply opacity to children if wrapper is tricky
+                }}>
+                    {/* Actually, let's just use the wrapper opacity. User can hover to restore? No, explicit toggle is better. */}
+                    {/* For now, just dim it. */}
+                    <ToolbarButton icon={<FiBold />} onClick={() => handleFormat('bold')} tooltip="Bold" />
+                    <ToolbarButton icon={<FiItalic />} onClick={() => handleFormat('italic')} tooltip="Italic" />
+                    <ToolbarButton icon={<FiUnderline />} onClick={() => handleFormat('underline')} tooltip="Underline" />
 
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
+                    <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
 
-                <ToolbarButton icon={<RiSubscript />} onClick={() => handleFormat('subscript')} tooltip="Subscript" />
-                <ToolbarButton icon={<RiSuperscript />} onClick={() => handleFormat('superscript')} tooltip="Superscript" />
+                    <ToolbarButton icon={<RiSubscript />} onClick={() => handleFormat('subscript')} tooltip="Subscript" />
+                    <ToolbarButton icon={<RiSuperscript />} onClick={() => handleFormat('superscript')} tooltip="Superscript" />
 
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
+                    <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
 
-                <select
-                    onChange={(e) => handleFormat('fontName', e.target.value)}
-                    style={{
-                        background: 'var(--color-bg-primary)',
-                        color: 'var(--color-text-primary)',
-                        border: '1px solid var(--color-bg-tertiary)',
-                        padding: '0.25rem',
-                        borderRadius: 'var(--radius-sm)',
-                        cursor: 'pointer'
-                    }}
-                    defaultValue="Inter"
-                >
-                    <option value="Inter">Default (Inter)</option>
-                    <option value="Playfair Display">Serif</option>
-                    <option value="VT323">Monospace</option>
-                    <option value="Dancing Script">Cursive</option>
-                </select>
+                    <select
+                        onChange={(e) => handleFormat('fontName', e.target.value)}
+                        style={{
+                            background: 'var(--color-bg-primary)',
+                            color: 'var(--color-text-primary)',
+                            border: '1px solid var(--color-bg-tertiary)',
+                            padding: '0.25rem',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer'
+                        }}
+                        defaultValue="Inter"
+                    >
+                        <option value="Inter">Default (Inter)</option>
+                        <option value="Playfair Display">Serif</option>
+                        <option value="VT323">Monospace</option>
+                        <option value="Dancing Script">Cursive</option>
+                    </select>
 
-                <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
+                    <div style={{ width: '1px', height: '24px', background: 'var(--color-bg-tertiary)', margin: '0 0.5rem' }} />
 
-                <ToolbarButton icon={<FiPenTool />} onClick={() => setShowCanvas(true)} tooltip="Sketch / Draw" />
-                <ToolbarButton icon={<FiMic />} onClick={() => setShowRecorder(!showRecorder)} tooltip="Voice Note" />
+                    <ToolbarButton icon={<FiPenTool />} onClick={() => setShowCanvas(true)} tooltip="Sketch / Draw" />
+                    <ToolbarButton icon={<FiMic />} onClick={() => setShowRecorder(!showRecorder)} tooltip="Voice Note" />
+                </div>
             </div>
 
             {/* Voice Recorder */}
@@ -273,10 +289,14 @@ const Editor = () => {
                 style={{
                     flex: 1,
                     outline: 'none',
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem', // Slightly larger in general
                     lineHeight: '1.8',
                     overflowY: 'auto',
-                    paddingBottom: '2rem'
+                    paddingBottom: '2rem',
+                    textAlign: isFocusMode ? 'left' : 'left', // Keep text left aligned usually
+                    maxWidth: isFocusMode ? '100%' : '100%', // Container handles width
+                    margin: '0 auto',
+                    transition: 'all 0.3s ease'
                 }}
                 placeholder="Start typing..."
                 className="editor-content"
