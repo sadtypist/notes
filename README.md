@@ -9,25 +9,29 @@
 ## ✨ Key Features
 
 - **Ultimate Theme System**: Choose from 25+ premium themes or build your own with the custom theme creator.
+- **Global Command Palette (Ctrl+K)**: Instant keyboard navigation. Search notes, switch themes, create folders, or export data without touching the mouse.
+- **One-Click Publish**: Share your notes instantly via a unique link. 100% Serverless & Offline-compatible using `lz-string` compression.
 - **Kanban Boards**: Turn any folder into a project board with fully customizable columns (e.g., "To Do", "In Progress", "Done").
 - **Rich Text Editor**: Format your thoughts with bold, italics, custom fonts, and more.
-- **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
-- **One-Click Publish**: Share your notes instantly via a unique link (Serverless/Offline-compatible).
-- **Voice Memos**: Record audio notes directly within your documents.
+- **Voice Memos**: Record audio notes directly within your documents. Includes basic transcription support.
 - **Digital Sketching**: Visual thinker? Draw and sketch ideas directly on an infinite canvas.
-- **Organization**: Keep things tidy with Folders, Pinned Notes, and Favorites. Includes a Trash Bin for safe deletion.
-- **Cloud Sync & Backup**: 
-  - **Google Drive**: Securely backup and restore your notes to your personal Google Drive.
-  - **Supabase**: Real-time sync capabilities (configurable).
+- **Smart Templates**: Jumpstart your writing with templates for Meetings, Journals, To-Do lists, and infinite Canvases.
+- **Organization**: Keep things tidy with Folders, Pinned Notes, Favorites, and a Trash Bin.
 - **Privacy First**: All data is stored locally in your browser by default. You own your data.
+- **Cloud Sync (Optional)**: Google Drive backup integration available.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18, Vite
-- **Styling**: Modern CSS3 (Variables, Glassmorphism design)
+- **Frontend**: React 19, Vite
+- **Styling**: Modern CSS3 (Variables, Glassmorphism), no external UI framework.
 - **Icons**: React Icons (Feather, Bootstrap Icons)
 - **State Management**: React Context API
-- **Routing**: React Router v6
+- **Routing**: React Router v7
+- **Utilities**: 
+  - `cmdk` (Command Palette)
+  - `lz-string` (URL Compression)
+  - `jspdf` & `docx` (Exporting)
+  - `idb-keyval` (IndexedDB Wrapper)
 
 ## 🚀 Getting Started
 
