@@ -9,7 +9,7 @@ const CommandPalette = () => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const { notes, createNote, createFolder, exportAllData } = useNotes();
-    const { theme, setTheme } = useTheme();
+    const { theme, applyTheme } = useTheme();
 
     // Toggle with Ctrl+K or Cmd+K
     useEffect(() => {
@@ -84,14 +84,11 @@ const CommandPalette = () => {
                     </Command.Group>
 
                     <Command.Group heading="Theme">
-                        <Command.Item onSelect={() => runCommand(() => setTheme('light'))}>
+                        <Command.Item onSelect={() => runCommand(() => applyTheme('clean-slate'))}>
                             <FiSun /> Light Theme
                         </Command.Item>
-                        <Command.Item onSelect={() => runCommand(() => setTheme('dark'))}>
+                        <Command.Item onSelect={() => runCommand(() => applyTheme('midnight-slate'))}>
                             <FiMoon /> Dark Theme
-                        </Command.Item>
-                        <Command.Item onSelect={() => runCommand(() => setTheme('system'))}>
-                            <FiMonitor /> System Theme
                         </Command.Item>
                     </Command.Group>
 
